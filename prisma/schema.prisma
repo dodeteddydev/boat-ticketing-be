@@ -1,0 +1,234 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  superadmin
+  boatowner
+  boatadmin
+  customer
+}
+
+enum Status {
+  verified
+  unverified
+}
+
+enum IdType {
+  ktp
+  passport
+}
+
+enum BookingStatus {
+  pending
+  paid
+  expired
+}
+
+enum TransactionType {
+  incoming
+  outgoing
+}
+
+model Country {
+  id Int @id @default(autoincrement())
+  country_name String @db.VarChar(100)
+  country_code String @db.VarChar(100)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  province Province[]
+  city City[]
+  port Port[]
+  booking Booking[]
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("country")
+}
+
+model Province {
+  id Int @id @default(autoincrement())
+  province_name String @db.VarChar(100)
+  province_code String @db.VarChar(100)
+  country_id Int
+  country Country @relation(fields: [country_id], references: [id], onDelete: Cascade)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  city City[]
+  port Port[]
+  booking Booking[]
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("province")
+}
+
+model City {
+  id Int @id @default(autoincrement())
+  city_name String @db.VarChar(100)
+  city_code String @db.VarChar(100)
+  country_id Int
+  country Country @relation(fields: [country_id], references: [id], onDelete: Cascade)
+  province_id Int
+  province Province @relation(fields: [province_id], references: [id], onDelete: Cascade)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  port Port[]
+  booking Booking[]
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("city")
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  role Role
+  name String @db.VarChar(100)
+  username String @db.VarChar(50)
+  email String @db.VarChar(100)
+  password String @db.VarChar(255)
+  status Status
+  wallet Wallet?
+  country Country[]
+  province Province[]
+  city City[]
+  category Category[]
+  boat Boat[]
+  port Port[]
+  schedule Schedule[]
+  booking Booking[]
+  created_by_id Int?
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("user")
+}
+
+model Wallet {
+  id Int @id @default(autoincrement())
+  amount Float
+  transaction Transaction[]
+  user_id Int @unique
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  updated_at DateTime @default(now())
+
+  @@map("wallet")
+}
+
+model Transaction {
+  id Int @id @default(autoincrement())
+  wallet_id Int
+  wallet Wallet @relation(fields: [wallet_id], references: [id], onDelete: Cascade)
+  transaction_type TransactionType
+  created_at DateTime @default(now())
+
+  @@map("transaction")
+}
+
+model Category {
+  id Int @id @default(autoincrement())
+  category_name String @db.VarChar(100)
+  category_code String @db.VarChar(100)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  boat Boat[]
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("category")
+}
+
+model Boat {
+  id Int @id @default(autoincrement())
+  boat_name String @db.VarChar(100)
+  boat_code String @db.VarChar(100)
+  category_id Int
+  category Category @relation(fields: [category_id], references: [id], onDelete: Cascade)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  schedule Schedule[]
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("boat")
+}
+
+model Port {
+  id Int @id @default(autoincrement())
+  port_name String @db.VarChar(100)
+  port_code String @db.VarChar(100)
+  country_id Int
+  country Country @relation(fields: [country_id], references: [id], onDelete: Cascade)
+  province_id Int
+  province Province @relation(fields: [province_id], references: [id], onDelete: Cascade)
+  city_id Int
+  city City @relation(fields: [city_id], references: [id], onDelete: Cascade)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  schedule_arrival Schedule[] @relation("arrival_port")
+  schedule_departure Schedule[] @relation("departure_port")
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("port")
+}
+
+model Schedule {
+  id Int @id @default(autoincrement())
+  schedule DateTime
+  seat Int
+  price Float
+  markup_price Float
+  boat_id Int
+  boat Boat @relation(fields: [boat_id], references: [id], onDelete: Cascade)
+  arrival_id Int
+  arrival Port @relation("arrival_port",fields: [arrival_id], references: [id], onDelete: Cascade)
+  departure_id Int
+  departure Port @relation("departure_port",fields: [departure_id], references: [id], onDelete: Cascade)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  booking Booking[]
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("schedule")
+}
+
+model Booking {
+  id Int @id @default(autoincrement())
+  schedule_id Int
+  schedule Schedule @relation(fields: [schedule_id], references: [id], onDelete: Cascade)
+  booking_number String @db.VarChar(50)
+  passenger_name String @db.VarChar(100)
+  id_type IdType
+  id_number String @db.VarChar(50)
+  country_id Int
+  country Country @relation(fields: [country_id], references: [id], onDelete: Cascade)
+  province_id Int
+  province Province @relation(fields: [province_id], references: [id], onDelete: Cascade)
+  city_id Int
+  city City @relation(fields: [city_id], references: [id], onDelete: Cascade)
+  address String @db.VarChar(255)
+  booking_status BookingStatus
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  created_at DateTime
+  updated_at DateTime @default(now())
+  active Boolean
+
+  @@map("booking")
+}
