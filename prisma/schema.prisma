@@ -39,15 +39,15 @@ model Country {
   id Int @id @default(autoincrement())
   country_name String @db.VarChar(100)
   country_code String @db.VarChar(100)
-  created_by_id Int
-  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  created_by_id Int?
+  created_by User? @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   province Province[]
   city City[]
   port Port[]
   booking Booking[]
-  created_at DateTime
-  updated_at DateTime @default(now())
-  active Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active Boolean @default(true)
 
   @@map("country")
 }
@@ -63,8 +63,8 @@ model Province {
   city City[]
   port Port[]
   booking Booking[]
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("province")
@@ -82,8 +82,8 @@ model City {
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   port Port[]
   booking Booking[]
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("city")
@@ -96,7 +96,7 @@ model User {
   username String @db.VarChar(50)
   email String @db.VarChar(100)
   password String @db.VarChar(255)
-  status Status
+  status Status @default(unverified)
   wallet Wallet?
   country Country[]
   province Province[]
@@ -107,9 +107,9 @@ model User {
   schedule Schedule[]
   booking Booking[]
   created_by_id Int?
-  created_at DateTime
-  updated_at DateTime @default(now())
-  active Boolean
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  active Boolean @default(true)
 
   @@map("user")
 }
@@ -120,7 +120,7 @@ model Wallet {
   transaction Transaction[]
   user_id Int @unique
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
-  updated_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 
   @@map("wallet")
 }
@@ -142,8 +142,8 @@ model Category {
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   boat Boat[]
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("category")
@@ -158,8 +158,8 @@ model Boat {
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   schedule Schedule[]
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("boat")
@@ -179,8 +179,8 @@ model Port {
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   schedule_arrival Schedule[] @relation("arrival_port")
   schedule_departure Schedule[] @relation("departure_port")
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("port")
@@ -201,8 +201,8 @@ model Schedule {
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   booking Booking[]
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("schedule")
@@ -226,8 +226,8 @@ model Booking {
   booking_status BookingStatus
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
-  created_at DateTime
-  updated_at DateTime @default(now())
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
   active Boolean
 
   @@map("booking")
