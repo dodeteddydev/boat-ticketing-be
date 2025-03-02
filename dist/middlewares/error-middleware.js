@@ -6,7 +6,11 @@ const error_response_1 = require("../utilities/error-response");
 const response_helpers_1 = require("../utilities/response-helpers");
 const errorMiddleware = (err, req, res, next) => {
     if (err instanceof zod_1.ZodError) {
-        res.status(400).json(response_helpers_1.ResponseHelpers.error("Validation Error", err.errors.map((e) => e.message)));
+        res
+            .status(400)
+            .json(response_helpers_1.ResponseHelpers.error("Validation Error", err.errors.length > 1
+            ? err.errors.map((e) => e.message)
+            : err.errors[0].message));
     }
     else if (err instanceof error_response_1.ErrorResponse) {
         res.status(err.status).json(response_helpers_1.ResponseHelpers.error(err.message, err.errors));

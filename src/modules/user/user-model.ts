@@ -45,9 +45,7 @@ export type CreateOrUpdateUserRequest = {
 };
 
 export type LoginRequest = {
-  name: string;
-  username: string;
-  email: string;
+  identifier: string;
   password: string;
 };
 
@@ -57,7 +55,7 @@ export const convertToLoginResponse = (
   refreshToken: string
 ): LoginResponse => {
   return {
-    id: 0,
+    id: user.id,
     role: user.role,
     name: user.name,
     username: user.username,
@@ -84,7 +82,7 @@ export const convertToUserResponse = (
   createdBy: CreatedBy | null
 ): UserResponse => {
   return {
-    id: 0,
+    id: user.id,
     role: user.role,
     name: user.name,
     username: user.username,

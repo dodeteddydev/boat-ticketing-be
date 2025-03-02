@@ -18,4 +18,13 @@ export class UserValidation {
       .string({ required_error: "Password is required" })
       .min(6, "Password must be at least 6 character"),
   });
+
+  static login: ZodType = z.object({
+    identifier: z
+      .string({ required_error: "Username or Email is required" })
+      .min(1, "Please enter username or email correctly"),
+    password: z
+      .string({ required_error: "Password is required" })
+      .min(6, "Password must be at least 6 character"),
+  });
 }
