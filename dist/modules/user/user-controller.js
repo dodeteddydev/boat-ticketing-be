@@ -20,7 +20,21 @@ class UserController {
                 const response = yield user_service_1.UserService.register(request);
                 res
                     .status(201)
-                    .json(response_helpers_1.ResponseHelpers.success("User created successfully", response));
+                    .json(response_helpers_1.ResponseHelpers.success("User registered successfully", response));
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    static login(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const request = req.body;
+                const response = yield user_service_1.UserService.login(request);
+                res
+                    .status(201)
+                    .json(response_helpers_1.ResponseHelpers.success("User Logged in successfully", response));
             }
             catch (error) {
                 next(error);

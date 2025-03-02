@@ -10,12 +10,16 @@ export const errorMiddleware = (
   next: NextFunction
 ) => {
   if (err instanceof ZodError) {
-    res.status(400).json(
-      ResponseHelpers.error(
-        "Validation Error",
-        err.errors.map((e) => e.message)
-      )
-    );
+    res
+      .status(400)
+      .json(
+        ResponseHelpers.error(
+          "Validation Error",
+          err.errors.length > 1
+            ? err.errors.map((e) => e.message)
+            : err.errors[0].message
+        )
+      );
   } else if (err instanceof ErrorResponse) {
     res.status(err.status).json(ResponseHelpers.error(err.message, err.errors));
   } else {

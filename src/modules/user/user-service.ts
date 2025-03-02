@@ -4,10 +4,15 @@ import { ErrorResponse } from "../../utilities/error-response";
 import { validation } from "../../utilities/validation";
 import {
   convertToCreateOrUpdateUserResponse,
+  convertToLoginResponse,
   CreateOrUpdateUserRequest,
   CreateOrUpdateUserResponse,
+  LoginRequest,
+  LoginResponse,
 } from "./user-model";
 import { UserValidation } from "./user-vaidation";
+import { JwtHelpers } from "../../utilities/jwt-helpers";
+import { logger } from "../../config/logger";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -19,13 +24,13 @@ export class UserService {
 
     const errorMessage =
       user?.name === name
-        ? "Name already registered"
+        ? "Name is already registered"
         : user?.username === username
-        ? "Username already used"
-        : "Email already registered";
+        ? "Username is already registered"
+        : "Email is already registered";
 
     if (user)
-      throw new ErrorResponse(400, "Failed to create user", errorMessage);
+      throw new ErrorResponse(400, "User registration failed", errorMessage);
   }
 
   static async register(
@@ -46,5 +51,44 @@ export class UserService {
     });
 
     return convertToCreateOrUpdateUserResponse(user);
+  }
+
+  static async login(request: LoginRequest): Promise<LoginResponse> {
+    const loginRequest = validation(UserValidation.login, request);
+
+    logger.info(loginRequest);
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: loginRequest.identifier },
+          { email: loginRequest.identifier },
+        ],
+      },
+    });
+
+    if (!user)
+      throw new ErrorResponse(
+        400,
+        "User login failed",
+        "No account found. Please sign up to continue."
+      );
+
+    const isValidPassword = await bcrypt.compare(
+      loginRequest.password,
+      user.password
+    );
+
+    if (!isValidPassword)
+      throw new ErrorResponse(
+        400,
+        "User login failed",
+        "Invalid username/email or password. Please try again!"
+      );
+
+    const accessToken = JwtHelpers.generateToken(user.id.toString()).access;
+    const refreshToken = JwtHelpers.generateToken(user.id.toString()).refresh;
+
+    return convertToLoginResponse(user, accessToken, refreshToken);
   }
 }

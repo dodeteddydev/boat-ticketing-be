@@ -22,3 +22,11 @@ UserValidation.register = zod_1.z.object({
         .string({ required_error: "Password is required" })
         .min(6, "Password must be at least 6 character"),
 });
+UserValidation.login = zod_1.z.object({
+    identifier: zod_1.z
+        .string({ required_error: "Username or Email is required" })
+        .min(1, "Please enter username or email correctly"),
+    password: zod_1.z
+        .string({ required_error: "Password is required" })
+        .min(6, "Password must be at least 6 character"),
+});

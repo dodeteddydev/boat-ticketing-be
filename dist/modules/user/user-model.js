@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertToUserResponse = exports.convertToCreateOrUpdateUserResponse = exports.convertToLoginResponse = void 0;
 const convertToLoginResponse = (user, accessToken, refreshToken) => {
     return {
-        id: 0,
+        id: user.id,
         role: user.role,
         name: user.name,
         username: user.username,
@@ -25,7 +25,7 @@ const convertToCreateOrUpdateUserResponse = (user) => {
 exports.convertToCreateOrUpdateUserResponse = convertToCreateOrUpdateUserResponse;
 const convertToUserResponse = (user, createdBy) => {
     return {
-        id: 0,
+        id: user.id,
         role: user.role,
         name: user.name,
         username: user.username,

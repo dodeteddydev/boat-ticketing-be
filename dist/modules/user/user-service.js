@@ -19,6 +19,8 @@ const error_response_1 = require("../../utilities/error-response");
 const validation_1 = require("../../utilities/validation");
 const user_model_1 = require("./user-model");
 const user_vaidation_1 = require("./user-vaidation");
+const jwt_helpers_1 = require("../../utilities/jwt-helpers");
+const logger_1 = require("../../config/logger");
 class UserService {
     static checkUserExist(name, username, email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -28,12 +30,12 @@ class UserService {
                 },
             });
             const errorMessage = (user === null || user === void 0 ? void 0 : user.name) === name
-                ? "Name already registered"
+                ? "Name is already registered"
                 : (user === null || user === void 0 ? void 0 : user.username) === username
-                    ? "Username already used"
-                    : "Email already registered";
+                    ? "Username is already registered"
+                    : "Email is already registered";
             if (user)
-                throw new error_response_1.ErrorResponse(400, "Failed to create user", errorMessage);
+                throw new error_response_1.ErrorResponse(400, "User registration failed", errorMessage);
         });
     }
     static register(request) {
@@ -45,6 +47,28 @@ class UserService {
                 data: registerRequest,
             });
             return (0, user_model_1.convertToCreateOrUpdateUserResponse)(user);
+        });
+    }
+    static login(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const loginRequest = (0, validation_1.validation)(user_vaidation_1.UserValidation.login, request);
+            logger_1.logger.info(loginRequest);
+            const user = yield database_1.prisma.user.findFirst({
+                where: {
+                    OR: [
+                        { username: loginRequest.identifier },
+                        { email: loginRequest.identifier },
+                    ],
+                },
+            });
+            if (!user)
+                throw new error_response_1.ErrorResponse(400, "User login failed", "No account found. Please sign up to continue.");
+            const isValidPassword = yield bcrypt_1.default.compare(loginRequest.password, user.password);
+            if (!isValidPassword)
+                throw new error_response_1.ErrorResponse(400, "User login failed", "Invalid username/email or password. Please try again!");
+            const accessToken = jwt_helpers_1.JwtHelpers.generateToken(user.id.toString()).access;
+            const refreshToken = jwt_helpers_1.JwtHelpers.generateToken(user.id.toString()).refresh;
+            return (0, user_model_1.convertToLoginResponse)(user, accessToken, refreshToken);
         });
     }
 }
