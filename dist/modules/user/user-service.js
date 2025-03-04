@@ -20,7 +20,6 @@ const validation_1 = require("../../utilities/validation");
 const user_model_1 = require("./user-model");
 const user_vaidation_1 = require("./user-vaidation");
 const jwt_helpers_1 = require("../../utilities/jwt-helpers");
-const logger_1 = require("../../config/logger");
 class UserService {
     static checkUserExist(name, username, email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -77,8 +76,6 @@ class UserService {
                     id: Number(request.userId),
                 },
             });
-            logger_1.logger.info(request.userId);
-            logger_1.logger.info(user);
             if (!user) {
                 throw new error_response_1.ErrorResponse(404, "User not found", "User with this ID doesn't exist!");
             }

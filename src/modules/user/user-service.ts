@@ -100,9 +100,6 @@ export class UserService {
       },
     });
 
-    logger.info(request.userId);
-    logger.info(user);
-
     if (!user) {
       throw new ErrorResponse(
         404,
