@@ -89,8 +89,8 @@ export const convertToUserResponse = (
     email: user.email,
     status: user.status,
     createdBy: createdBy,
-    createdAt: user.created_at.toString(),
-    updatedAt: user.updated_at.toString(),
+    createdAt: user.created_at.toISOString(),
+    updatedAt: user.updated_at.toISOString(),
     active: user.active,
   };
 };

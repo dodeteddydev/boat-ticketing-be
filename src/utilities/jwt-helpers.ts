@@ -1,4 +1,5 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import "dotenv/config";
 
 const accessSecret = process.env.JWT_ACCESS_SECRET as string;
 const refreshSecret = process.env.JWT_REFRESH_SECRET as string;
@@ -18,7 +19,7 @@ export class JwtHelpers {
     return { access, refresh };
   }
 
-  static verifyToken(token: string) {
-    return jwt.verify(token, accessSecret);
+  static verifyToken(token: string): JwtPayload & { userId: number } {
+    return jwt.verify(token, accessSecret) as JwtPayload & { userId: number };
   }
 }

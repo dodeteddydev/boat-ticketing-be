@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.convertToUserResponse = exports.convertToCreateOrUpdateUserResponse = exports.convertToLoginResponse = void 0;
+const date_format_1 = require("../../utilities/date-format");
 const convertToLoginResponse = (user, accessToken, refreshToken) => {
     return {
         id: user.id,
@@ -32,8 +33,8 @@ const convertToUserResponse = (user, createdBy) => {
         email: user.email,
         status: user.status,
         createdBy: createdBy,
-        createdAt: user.created_at.toString(),
-        updatedAt: user.updated_at.toString(),
+        createdAt: (0, date_format_1.dateFormat)(user.created_at),
+        updatedAt: (0, date_format_1.dateFormat)(user.updated_at),
         active: user.active,
     };
 };
