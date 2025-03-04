@@ -20,7 +20,6 @@ const validation_1 = require("../../utilities/validation");
 const user_model_1 = require("./user-model");
 const user_vaidation_1 = require("./user-vaidation");
 const jwt_helpers_1 = require("../../utilities/jwt-helpers");
-const logger_1 = require("../../config/logger");
 class UserService {
     static checkUserExist(name, username, email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -52,7 +51,6 @@ class UserService {
     static login(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const loginRequest = (0, validation_1.validation)(user_vaidation_1.UserValidation.login, request);
-            logger_1.logger.info(loginRequest);
             const user = yield database_1.prisma.user.findFirst({
                 where: {
                     OR: [
@@ -69,6 +67,19 @@ class UserService {
             const accessToken = jwt_helpers_1.JwtHelpers.generateToken(user.id.toString()).access;
             const refreshToken = jwt_helpers_1.JwtHelpers.generateToken(user.id.toString()).refresh;
             return (0, user_model_1.convertToLoginResponse)(user, accessToken, refreshToken);
+        });
+    }
+    static get(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield database_1.prisma.user.findUnique({
+                where: {
+                    id: Number(request.userId),
+                },
+            });
+            if (!user) {
+                throw new error_response_1.ErrorResponse(404, "User not found", "User with this ID doesn't exist!");
+            }
+            return (0, user_model_1.convertToUserResponse)(user, null);
         });
     }
 }

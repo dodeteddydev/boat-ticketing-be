@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JwtHelpers = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+require("dotenv/config");
 const accessSecret = process.env.JWT_ACCESS_SECRET;
 const refreshSecret = process.env.JWT_REFRESH_SECRET;
 const accessExpires = process.env.JWT_ACCESS_EXPIRES;

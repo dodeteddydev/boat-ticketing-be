@@ -5,14 +5,17 @@ import { validation } from "../../utilities/validation";
 import {
   convertToCreateOrUpdateUserResponse,
   convertToLoginResponse,
+  convertToUserResponse,
   CreateOrUpdateUserRequest,
   CreateOrUpdateUserResponse,
   LoginRequest,
   LoginResponse,
+  UserResponse,
 } from "./user-model";
 import { UserValidation } from "./user-vaidation";
 import { JwtHelpers } from "../../utilities/jwt-helpers";
 import { logger } from "../../config/logger";
+import { AuthRequest } from "../../middlewares/auth-middleware";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -56,8 +59,6 @@ export class UserService {
   static async login(request: LoginRequest): Promise<LoginResponse> {
     const loginRequest = validation(UserValidation.login, request);
 
-    logger.info(loginRequest);
-
     const user = await prisma.user.findFirst({
       where: {
         OR: [
@@ -90,5 +91,22 @@ export class UserService {
     const refreshToken = JwtHelpers.generateToken(user.id.toString()).refresh;
 
     return convertToLoginResponse(user, accessToken, refreshToken);
+  }
+
+  static async get(request: AuthRequest): Promise<UserResponse> {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: Number(request.userId),
+      },
+    });
+
+    if (!user) {
+      throw new ErrorResponse(
+        404,
+        "User not found",
+        "User with this ID doesn't exist!"
+      );
+    }
+    return convertToUserResponse(user, null);
   }
 }
