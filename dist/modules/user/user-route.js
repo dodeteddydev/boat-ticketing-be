@@ -10,4 +10,5 @@ const user_controller_1 = require("./user-controller");
 exports.userRoute = express_1.default.Router();
 exports.userRoute.post("/api/auth/register", user_controller_1.UserController.register);
 exports.userRoute.post("/api/auth/login", user_controller_1.UserController.login);
+exports.userRoute.post("/api/auth/refresh", user_controller_1.UserController.refresh);
 exports.userRoute.get("/api/user/profile", auth_middleware_1.authMiddleware, user_controller_1.UserController.get);

@@ -27,4 +27,8 @@ export class UserValidation {
       .string({ required_error: "Password is required" })
       .min(6, "Password must be at least 6 character"),
   });
+
+  static refresh: ZodType = z.object({
+    refreshToken: z.string({ required_error: "Refresh token is required" }),
+  });
 }

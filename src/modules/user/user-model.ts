@@ -36,6 +36,11 @@ export type LoginResponse = {
   refreshToken: string;
 };
 
+export type RefreshResponse = {
+  accessToken: string;
+  refreshToken: string;
+};
+
 export type CreateOrUpdateUserRequest = {
   role: Role;
   name: string;
@@ -47,6 +52,10 @@ export type CreateOrUpdateUserRequest = {
 export type LoginRequest = {
   identifier: string;
   password: string;
+};
+
+export type RefreshRequest = {
+  refreshToken: string;
 };
 
 export const convertToLoginResponse = (

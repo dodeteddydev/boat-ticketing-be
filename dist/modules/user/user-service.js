@@ -16,10 +16,10 @@ exports.UserService = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const database_1 = require("../../config/database");
 const error_response_1 = require("../../utilities/error-response");
+const jwt_helpers_1 = require("../../utilities/jwt-helpers");
 const validation_1 = require("../../utilities/validation");
 const user_model_1 = require("./user-model");
 const user_vaidation_1 = require("./user-vaidation");
-const jwt_helpers_1 = require("../../utilities/jwt-helpers");
 class UserService {
     static checkUserExist(name, username, email) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -80,6 +80,22 @@ class UserService {
                 throw new error_response_1.ErrorResponse(404, "User not found", "User with this ID doesn't exist!");
             }
             return (0, user_model_1.convertToUserResponse)(user, null);
+        });
+    }
+    static refresh(request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const refreshRequest = (0, validation_1.validation)(user_vaidation_1.UserValidation.refresh, request);
+            const decode = jwt_helpers_1.JwtHelpers.verifyToken(refreshRequest.refreshToken);
+            if (!decode) {
+                throw new error_response_1.ErrorResponse(401, "Unauthorized", "");
+            }
+            const userId = decode.userId;
+            const accessToken = jwt_helpers_1.JwtHelpers.generateToken(userId.toString()).access;
+            const refreshToken = jwt_helpers_1.JwtHelpers.generateToken(userId.toString()).refresh;
+            return {
+                accessToken,
+                refreshToken,
+            };
         });
     }
 }
