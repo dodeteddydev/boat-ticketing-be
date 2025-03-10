@@ -1,5 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { CreateOrUpdateUserRequest, LoginRequest } from "./user-model";
+import {
+  CreateOrUpdateUserRequest,
+  LoginRequest,
+  RefreshRequest,
+} from "./user-model";
 import { UserService } from "./user-service";
 import { ResponseHelpers } from "../../utilities/response-helpers";
 import { AuthRequest } from "../../middlewares/auth-middleware";
@@ -37,6 +41,18 @@ export class UserController {
       res
         .status(200)
         .json(ResponseHelpers.success("User get successfully", response));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const request = req.body as RefreshRequest;
+      const response = await UserService.refresh(request);
+      res
+        .status(200)
+        .json(ResponseHelpers.success("Refresh token success", response));
     } catch (error) {
       next(error);
     }

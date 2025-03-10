@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { JwtHelpers } from "../utilities/jwt-helpers";
 import { ResponseHelpers } from "../utilities/response-helpers";
-import { logger } from "../config/logger";
 
 export interface AuthRequest extends Request {
   userId?: number;
@@ -20,7 +19,7 @@ export const authMiddleware = (
   }
 
   try {
-    const decode = JwtHelpers.verifyToken(token!);
+    const decode = JwtHelpers.verifyAccessToken(token!);
     req.userId = decode.userId;
     next();
   } catch (error) {

@@ -19,7 +19,11 @@ export class JwtHelpers {
     return { access, refresh };
   }
 
-  static verifyToken(token: string): JwtPayload & { userId: number } {
+  static verifyAccessToken(token: string): JwtPayload & { userId: number } {
     return jwt.verify(token, accessSecret) as JwtPayload & { userId: number };
+  }
+
+  static verifyRefreshToken(token: string): JwtPayload & { userId: number } {
+    return jwt.verify(token, refreshSecret) as JwtPayload & { userId: number };
   }
 }

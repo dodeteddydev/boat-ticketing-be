@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../../config/database";
+import { AuthRequest } from "../../middlewares/auth-middleware";
 import { ErrorResponse } from "../../utilities/error-response";
+import { JwtHelpers } from "../../utilities/jwt-helpers";
 import { validation } from "../../utilities/validation";
 import {
   convertToCreateOrUpdateUserResponse,
@@ -10,12 +12,11 @@ import {
   CreateOrUpdateUserResponse,
   LoginRequest,
   LoginResponse,
+  RefreshRequest,
+  RefreshResponse,
   UserResponse,
 } from "./user-model";
 import { UserValidation } from "./user-vaidation";
-import { JwtHelpers } from "../../utilities/jwt-helpers";
-import { logger } from "../../config/logger";
-import { AuthRequest } from "../../middlewares/auth-middleware";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -108,5 +109,21 @@ export class UserService {
       );
     }
     return convertToUserResponse(user, null);
+  }
+
+  static async refresh(request: RefreshRequest): Promise<RefreshResponse> {
+    const refreshRequest = validation(UserValidation.refresh, request);
+
+    const decode = JwtHelpers.verifyRefreshToken(refreshRequest.refreshToken);
+
+    const userId = decode.userId;
+
+    const accessToken = JwtHelpers.generateToken(userId.toString()).access;
+    const refreshToken = JwtHelpers.generateToken(userId.toString()).refresh;
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

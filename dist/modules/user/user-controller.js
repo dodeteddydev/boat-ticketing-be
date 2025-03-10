@@ -54,5 +54,19 @@ class UserController {
             }
         });
     }
+    static refresh(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const request = req.body;
+                const response = yield user_service_1.UserService.refresh(request);
+                res
+                    .status(200)
+                    .json(response_helpers_1.ResponseHelpers.success("Refresh token success", response));
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
 }
 exports.UserController = UserController;
