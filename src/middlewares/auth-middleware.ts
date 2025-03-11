@@ -23,6 +23,6 @@ export const authMiddleware = (
     req.userId = decode.userId;
     next();
   } catch (error) {
-    res.status(403).json(ResponseHelpers.error("Unauthorized", ""));
+    res.status(401).json(ResponseHelpers.error("Unauthorized", ""));
   }
 };

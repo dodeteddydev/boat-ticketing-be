@@ -85,10 +85,7 @@ class UserService {
     static refresh(request) {
         return __awaiter(this, void 0, void 0, function* () {
             const refreshRequest = (0, validation_1.validation)(user_vaidation_1.UserValidation.refresh, request);
-            const decode = jwt_helpers_1.JwtHelpers.verifyToken(refreshRequest.refreshToken);
-            if (!decode) {
-                throw new error_response_1.ErrorResponse(401, "Unauthorized", "");
-            }
+            const decode = jwt_helpers_1.JwtHelpers.verifyRefreshToken(refreshRequest.refreshToken);
             const userId = decode.userId;
             const accessToken = jwt_helpers_1.JwtHelpers.generateToken(userId.toString()).access;
             const refreshToken = jwt_helpers_1.JwtHelpers.generateToken(userId.toString()).refresh;

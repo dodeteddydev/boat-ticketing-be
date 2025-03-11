@@ -13,15 +13,18 @@ const refreshExpires = process.env.JWT_REFRESH_EXPIRES;
 class JwtHelpers {
     static generateToken(userId) {
         const access = jsonwebtoken_1.default.sign({ userId }, accessSecret, {
-            expiresIn: `${Number(accessExpires)}m`,
+            expiresIn: `${Number(accessExpires)}s`,
         });
         const refresh = jsonwebtoken_1.default.sign({ userId }, refreshSecret, {
-            expiresIn: `${Number(refreshExpires)}m`,
+            expiresIn: `${Number(refreshExpires)}s`,
         });
         return { access, refresh };
     }
-    static verifyToken(token) {
+    static verifyAccessToken(token) {
         return jsonwebtoken_1.default.verify(token, accessSecret);
+    }
+    static verifyRefreshToken(token) {
+        return jsonwebtoken_1.default.verify(token, refreshSecret);
     }
 }
 exports.JwtHelpers = JwtHelpers;

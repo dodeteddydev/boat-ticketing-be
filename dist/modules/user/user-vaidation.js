@@ -31,5 +31,5 @@ UserValidation.login = zod_1.z.object({
         .min(6, "Password must be at least 6 character"),
 });
 UserValidation.refresh = zod_1.z.object({
-    refreshToken: zod_1.z.string({ required_error: "Refresh Token is required" }),
+    refreshToken: zod_1.z.string({ required_error: "Refresh token is required" }),
 });

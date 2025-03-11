@@ -11,12 +11,12 @@ const authMiddleware = (req, res, next) => {
         return;
     }
     try {
-        const decode = jwt_helpers_1.JwtHelpers.verifyToken(token);
+        const decode = jwt_helpers_1.JwtHelpers.verifyAccessToken(token);
         req.userId = decode.userId;
         next();
     }
     catch (error) {
-        res.status(403).json(response_helpers_1.ResponseHelpers.error("Unauthorized", ""));
+        res.status(401).json(response_helpers_1.ResponseHelpers.error("Unauthorized", ""));
     }
 };
 exports.authMiddleware = authMiddleware;
