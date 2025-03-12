@@ -1,4 +1,4 @@
-import { Pageable } from "../types/pagable";
+import { Pageable } from "../types/pageable";
 
 export class ResponseHelpers {
   static success<T>(message: string, data: T) {
