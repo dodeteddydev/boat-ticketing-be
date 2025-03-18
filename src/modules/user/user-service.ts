@@ -16,7 +16,7 @@ import {
   RefreshResponse,
   UserResponse,
 } from "./user-model";
-import { UserValidation } from "./user-vaidation";
+import { UserValidation } from "./user-validation";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
