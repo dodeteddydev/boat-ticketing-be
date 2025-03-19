@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { ErrorResponse } from "../utilities/errorResponse";
 import { ResponseHelpers } from "../utilities/responseHelpers";
+import { JsonWebTokenError } from "jsonwebtoken";
 
 export const errorMiddleware = (
   err: Error,
@@ -22,6 +23,15 @@ export const errorMiddleware = (
       );
   } else if (err instanceof ErrorResponse) {
     res.status(err.status).json(ResponseHelpers.error(err.message, err.errors));
+  } else if (err instanceof JsonWebTokenError) {
+    res
+      .status(401)
+      .json(
+        ResponseHelpers.error(
+          "Unauthorized",
+          "Invalid or missing authentication token"
+        )
+      );
   } else {
     res
       .status(500)
