@@ -4,6 +4,7 @@ exports.errorMiddleware = void 0;
 const zod_1 = require("zod");
 const errorResponse_1 = require("../utilities/errorResponse");
 const responseHelpers_1 = require("../utilities/responseHelpers");
+const jsonwebtoken_1 = require("jsonwebtoken");
 const errorMiddleware = (err, req, res, next) => {
     if (err instanceof zod_1.ZodError) {
         res
@@ -14,6 +15,11 @@ const errorMiddleware = (err, req, res, next) => {
     }
     else if (err instanceof errorResponse_1.ErrorResponse) {
         res.status(err.status).json(responseHelpers_1.ResponseHelpers.error(err.message, err.errors));
+    }
+    else if (err instanceof jsonwebtoken_1.JsonWebTokenError) {
+        res
+            .status(401)
+            .json(responseHelpers_1.ResponseHelpers.error("Unauthorized", "Invalid or missing authentication token"));
     }
     else {
         res
