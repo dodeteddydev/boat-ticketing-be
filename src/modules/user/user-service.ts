@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../../config/database";
-import { AuthRequest } from "../../middlewares/auth-middleware";
-import { ErrorResponse } from "../../utilities/error-response";
-import { JwtHelpers } from "../../utilities/jwt-helpers";
+import { AuthRequest } from "../../middlewares/authMiddleware";
+import { ErrorResponse } from "../../utilities/errorResponse";
+import { JwtHelpers } from "../../utilities/jwtHelpers";
 import { validation } from "../../utilities/validation";
 import {
   convertToCreateOrUpdateUserResponse,
@@ -16,7 +16,7 @@ import {
   RefreshResponse,
   UserResponse,
 } from "./user-model";
-import { UserValidation } from "./user-vaidation";
+import { UserValidation } from "./user-validation";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {

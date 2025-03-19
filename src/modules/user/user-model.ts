@@ -1,9 +1,5 @@
 import { Role, Status, User } from "@prisma/client";
-
-export type CreatedBy = {
-  id: number;
-  name: string;
-};
+import { CreatedBy } from "../../types/createBy";
 
 export type UserResponse = {
   id: number;

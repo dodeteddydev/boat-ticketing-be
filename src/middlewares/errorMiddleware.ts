@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
-import { ErrorResponse } from "../utilities/error-response";
-import { ResponseHelpers } from "../utilities/response-helpers";
+import { ErrorResponse } from "../utilities/errorResponse";
+import { ResponseHelpers } from "../utilities/responseHelpers";
 
 export const errorMiddleware = (
   err: Error,

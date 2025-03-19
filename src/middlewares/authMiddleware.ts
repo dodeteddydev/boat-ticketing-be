@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { JwtHelpers } from "../utilities/jwt-helpers";
-import { ResponseHelpers } from "../utilities/response-helpers";
+import { JwtHelpers } from "../utilities/jwtHelpers";
+import { ResponseHelpers } from "../utilities/responseHelpers";
 
 export interface AuthRequest extends Request {
   userId?: number;
@@ -14,7 +14,14 @@ export const authMiddleware = (
   const token = req.header("Authorization")?.split(" ")[1];
 
   if (!token) {
-    res.status(401).json(ResponseHelpers.error("Unauthorized", ""));
+    res
+      .status(401)
+      .json(
+        ResponseHelpers.error(
+          "Unauthorized",
+          "Invalid or missing authentication token"
+        )
+      );
     return;
   }
 
@@ -23,6 +30,13 @@ export const authMiddleware = (
     req.userId = decode.userId;
     next();
   } catch (error) {
-    res.status(401).json(ResponseHelpers.error("Unauthorized", ""));
+    res
+      .status(401)
+      .json(
+        ResponseHelpers.error(
+          "Unauthorized",
+          "Invalid or missing authentication token"
+        )
+      );
   }
 };

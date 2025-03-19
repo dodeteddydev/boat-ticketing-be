@@ -5,8 +5,8 @@ import {
   RefreshRequest,
 } from "./user-model";
 import { UserService } from "./user-service";
-import { ResponseHelpers } from "../../utilities/response-helpers";
-import { AuthRequest } from "../../middlewares/auth-middleware";
+import { ResponseHelpers } from "../../utilities/responseHelpers";
+import { AuthRequest } from "../../middlewares/authMiddleware";
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
