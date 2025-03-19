@@ -4,10 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const error_middleware_1 = require("./middlewares/error-middleware");
-const not_found_middleware_1 = require("./middlewares/not-found-middleware");
+const errorMiddleware_1 = require("./middlewares/errorMiddleware");
+const notFoundMiddleware_1 = require("./middlewares/notFoundMiddleware");
 const user_route_1 = require("./modules/user/user-route");
 const cors_1 = __importDefault(require("cors"));
+const country_route_1 = require("./modules/country/country-route");
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
 const app = (0, express_1.default)();
@@ -15,7 +16,8 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 // ROUTE
 app.use(user_route_1.userRoute);
+app.use(country_route_1.countryRoute);
 // MIDDLEWARE
-app.use(not_found_middleware_1.notFoundMiddleware);
-app.use(error_middleware_1.errorMiddleware);
+app.use(notFoundMiddleware_1.notFoundMiddleware);
+app.use(errorMiddleware_1.errorMiddleware);
 app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}`));

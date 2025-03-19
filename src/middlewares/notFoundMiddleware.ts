@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { ResponseHelpers } from "../utilities/response-helpers";
+import { ResponseHelpers } from "../utilities/responseHelpers";
 
 export const notFoundMiddleware = (
   req: Request,

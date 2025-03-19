@@ -1,8 +1,9 @@
 import express from "express";
-import { errorMiddleware } from "./middlewares/error-middleware";
-import { notFoundMiddleware } from "./middlewares/not-found-middleware";
+import { errorMiddleware } from "./middlewares/errorMiddleware";
+import { notFoundMiddleware } from "./middlewares/notFoundMiddleware";
 import { userRoute } from "./modules/user/user-route";
 import cors from "cors";
+import { countryRoute } from "./modules/country/country-route";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -15,6 +16,7 @@ app.use(cors());
 
 // ROUTE
 app.use(userRoute);
+app.use(countryRoute);
 
 // MIDDLEWARE
 app.use(notFoundMiddleware);

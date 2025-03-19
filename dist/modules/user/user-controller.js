@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const user_service_1 = require("./user-service");
-const response_helpers_1 = require("../../utilities/response-helpers");
+const responseHelpers_1 = require("../../utilities/responseHelpers");
 class UserController {
     static register(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -20,7 +20,7 @@ class UserController {
                 const response = yield user_service_1.UserService.register(request);
                 res
                     .status(201)
-                    .json(response_helpers_1.ResponseHelpers.success("User registered successfully", response));
+                    .json(responseHelpers_1.ResponseHelpers.success("User registered successfully", response));
             }
             catch (error) {
                 next(error);
@@ -34,7 +34,7 @@ class UserController {
                 const response = yield user_service_1.UserService.login(request);
                 res
                     .status(201)
-                    .json(response_helpers_1.ResponseHelpers.success("User Logged in successfully", response));
+                    .json(responseHelpers_1.ResponseHelpers.success("User Logged in successfully", response));
             }
             catch (error) {
                 next(error);
@@ -47,7 +47,7 @@ class UserController {
                 const response = yield user_service_1.UserService.get(req);
                 res
                     .status(200)
-                    .json(response_helpers_1.ResponseHelpers.success("User get successfully", response));
+                    .json(responseHelpers_1.ResponseHelpers.success("User get successfully", response));
             }
             catch (error) {
                 next(error);
@@ -61,7 +61,7 @@ class UserController {
                 const response = yield user_service_1.UserService.refresh(request);
                 res
                     .status(200)
-                    .json(response_helpers_1.ResponseHelpers.success("Refresh token success", response));
+                    .json(responseHelpers_1.ResponseHelpers.success("Refresh token success", response));
             }
             catch (error) {
                 next(error);
