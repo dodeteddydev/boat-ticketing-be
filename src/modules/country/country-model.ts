@@ -1,11 +1,17 @@
 import { Country } from "@prisma/client";
-import { CreatedBy } from "../../types/createBy";
+import { UserGlobalResponse } from "../user/user-model";
+
+export type CountryGlobalResponse = {
+  id: number;
+  countryName: string;
+  countryCode: string;
+};
 
 export type CountryResponse = {
   id: number;
   countryName: string;
   countryCode: string;
-  createdBy: CreatedBy | null;
+  createdBy: UserGlobalResponse | null;
   createdAt: string;
   updatedAt: string;
   active: boolean;
@@ -22,9 +28,9 @@ export type FilterCountryRequest = {
   size: number;
 };
 
-export const convertToCountryResponse = (
+export const convertCountryResponse = (
   country: Country,
-  createdBy: CreatedBy
+  createdBy: UserGlobalResponse
 ): CountryResponse => {
   return {
     id: country.id,
@@ -34,5 +40,15 @@ export const convertToCountryResponse = (
     createdAt: country.created_at.toISOString(),
     updatedAt: country.updated_at.toISOString(),
     active: country.active,
+  };
+};
+
+export const convertCountryGlobalResponse = (
+  country: Country
+): CountryGlobalResponse => {
+  return {
+    id: country.id,
+    countryName: country.country_name,
+    countryCode: country.country_code,
   };
 };

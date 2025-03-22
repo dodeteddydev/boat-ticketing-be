@@ -4,8 +4,9 @@ import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
 import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
+import { convertUserGlobalResponse } from "../user/user-model";
 import {
-  convertToCountryResponse,
+  convertCountryResponse,
   CountryRequest,
   CountryResponse,
   FilterCountryRequest,
@@ -53,10 +54,10 @@ export class CountryService {
       },
     });
 
-    return convertToCountryResponse(createdCountry, {
-      id: createdCountry.created_by?.id!,
-      name: createdCountry.created_by?.name!,
-    });
+    return convertCountryResponse(
+      createdCountry,
+      convertUserGlobalResponse(createdCountry.created_by)
+    );
   }
 
   static async update(
@@ -98,10 +99,10 @@ export class CountryService {
       },
     });
 
-    return convertToCountryResponse(updatedCountry, {
-      id: updatedCountry.created_by?.id!,
-      name: updatedCountry.created_by?.name!,
-    });
+    return convertCountryResponse(
+      updatedCountry,
+      convertUserGlobalResponse(updatedCountry.created_by)
+    );
   }
 
   static async active(
@@ -181,10 +182,10 @@ export class CountryService {
 
     return {
       data: getCountry.map((value) =>
-        convertToCountryResponse(value, {
-          id: value.created_by?.id!,
-          name: value.created_by?.name!,
-        })
+        convertCountryResponse(
+          value,
+          convertUserGlobalResponse(value.created_by)
+        )
       ),
       paging: {
         currentPage: getRequest.page,
