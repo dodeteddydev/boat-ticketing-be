@@ -1,5 +1,9 @@
 import { Role, Status, User } from "@prisma/client";
-import { CreatedBy } from "../../types/createBy";
+
+export type UserGlobalResponse = {
+  id: number;
+  name: string;
+};
 
 export type UserResponse = {
   id: number;
@@ -8,7 +12,7 @@ export type UserResponse = {
   username: string;
   email: string;
   status: Status;
-  createdBy: CreatedBy | null;
+  createdBy: UserGlobalResponse | null;
   createdAt: string;
   updatedAt: string;
   active: boolean;
@@ -54,7 +58,7 @@ export type RefreshRequest = {
   refreshToken: string;
 };
 
-export const convertToLoginResponse = (
+export const convertLoginResponse = (
   user: User,
   accessToken: string,
   refreshToken: string
@@ -70,7 +74,7 @@ export const convertToLoginResponse = (
   };
 };
 
-export const convertToCreateOrUpdateUserResponse = (
+export const convertCreateOrUpdateUserResponse = (
   user: User
 ): CreateOrUpdateUserResponse => {
   return {
@@ -82,9 +86,9 @@ export const convertToCreateOrUpdateUserResponse = (
   };
 };
 
-export const convertToUserResponse = (
+export const convertUserResponse = (
   user: User,
-  createdBy: CreatedBy | null
+  createdBy: UserGlobalResponse | null
 ): UserResponse => {
   return {
     id: user.id,
@@ -97,5 +101,14 @@ export const convertToUserResponse = (
     createdAt: user.created_at.toISOString(),
     updatedAt: user.updated_at.toISOString(),
     active: user.active,
+  };
+};
+
+export const convertUserGlobalResponse = (
+  createdBy: User
+): UserGlobalResponse => {
+  return {
+    id: createdBy.id,
+    name: createdBy.name,
   };
 };

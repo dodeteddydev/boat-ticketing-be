@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertToCountryResponse = void 0;
-const convertToCountryResponse = (country, createdBy) => {
+exports.convertCountryGlobalResponse = exports.convertCountryResponse = void 0;
+const convertCountryResponse = (country, createdBy) => {
     return {
         id: country.id,
         countryName: country.country_name,
@@ -12,4 +12,12 @@ const convertToCountryResponse = (country, createdBy) => {
         active: country.active,
     };
 };
-exports.convertToCountryResponse = convertToCountryResponse;
+exports.convertCountryResponse = convertCountryResponse;
+const convertCountryGlobalResponse = (country) => {
+    return {
+        id: country.id,
+        countryName: country.country_name,
+        countryCode: country.country_code,
+    };
+};
+exports.convertCountryGlobalResponse = convertCountryGlobalResponse;
