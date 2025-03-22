@@ -76,6 +76,7 @@ class ProvinceController {
             try {
                 const request = {
                     search: req.query.search,
+                    countryId: req.query.countryId && Number(req.query.countryId),
                     page: req.query.page ? Number(req.query.page) : 1,
                     size: req.query.size ? Number(req.query.size) : 10,
                 };
