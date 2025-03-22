@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.convertToUserResponse = exports.convertToCreateOrUpdateUserResponse = exports.convertToLoginResponse = void 0;
-const convertToLoginResponse = (user, accessToken, refreshToken) => {
+exports.convertUserGlobalResponse = exports.convertUserResponse = exports.convertCreateOrUpdateUserResponse = exports.convertLoginResponse = void 0;
+const convertLoginResponse = (user, accessToken, refreshToken) => {
     return {
         id: user.id,
         role: user.role,
@@ -12,8 +12,8 @@ const convertToLoginResponse = (user, accessToken, refreshToken) => {
         refreshToken: refreshToken,
     };
 };
-exports.convertToLoginResponse = convertToLoginResponse;
-const convertToCreateOrUpdateUserResponse = (user) => {
+exports.convertLoginResponse = convertLoginResponse;
+const convertCreateOrUpdateUserResponse = (user) => {
     return {
         id: user.id,
         role: user.role,
@@ -22,8 +22,8 @@ const convertToCreateOrUpdateUserResponse = (user) => {
         email: user.email,
     };
 };
-exports.convertToCreateOrUpdateUserResponse = convertToCreateOrUpdateUserResponse;
-const convertToUserResponse = (user, createdBy) => {
+exports.convertCreateOrUpdateUserResponse = convertCreateOrUpdateUserResponse;
+const convertUserResponse = (user, createdBy) => {
     return {
         id: user.id,
         role: user.role,
@@ -37,4 +37,11 @@ const convertToUserResponse = (user, createdBy) => {
         active: user.active,
     };
 };
-exports.convertToUserResponse = convertToUserResponse;
+exports.convertUserResponse = convertUserResponse;
+const convertUserGlobalResponse = (createdBy) => {
+    return {
+        id: createdBy.id,
+        name: createdBy.name,
+    };
+};
+exports.convertUserGlobalResponse = convertUserGlobalResponse;

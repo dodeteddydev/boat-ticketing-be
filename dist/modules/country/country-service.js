@@ -14,6 +14,7 @@ const database_1 = require("../../config/database");
 const errorResponse_1 = require("../../utilities/errorResponse");
 const validation_1 = require("../../utilities/validation");
 const activeValidation_1 = require("../../validation/activeValidation");
+const user_model_1 = require("../user/user-model");
 const country_model_1 = require("./country-model");
 const country_validation_1 = require("./country-validation");
 class CountryService {
@@ -35,7 +36,6 @@ class CountryService {
     }
     static create(request, userId) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
             const createRequest = (0, validation_1.validation)(country_validation_1.CountryValidation.create, request);
             yield this.checkCountryExist(createRequest.countryName, createRequest.countryCode);
             const createdCountry = yield database_1.prisma.country.create({
@@ -48,15 +48,11 @@ class CountryService {
                     created_by: true,
                 },
             });
-            return (0, country_model_1.convertToCountryResponse)(createdCountry, {
-                id: (_a = createdCountry.created_by) === null || _a === void 0 ? void 0 : _a.id,
-                name: (_b = createdCountry.created_by) === null || _b === void 0 ? void 0 : _b.name,
-            });
+            return (0, country_model_1.convertCountryResponse)(createdCountry, (0, user_model_1.convertUserGlobalResponse)(createdCountry.created_by));
         });
     }
     static update(request, id) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
             const updateRequest = (0, validation_1.validation)(country_validation_1.CountryValidation.create, request);
             const existingCountry = yield database_1.prisma.country.findUnique({
                 where: { id },
@@ -78,10 +74,7 @@ class CountryService {
                     created_by: true,
                 },
             });
-            return (0, country_model_1.convertToCountryResponse)(updatedCountry, {
-                id: (_a = updatedCountry.created_by) === null || _a === void 0 ? void 0 : _a.id,
-                name: (_b = updatedCountry.created_by) === null || _b === void 0 ? void 0 : _b.name,
-            });
+            return (0, country_model_1.convertCountryResponse)(updatedCountry, (0, user_model_1.convertUserGlobalResponse)(updatedCountry.created_by));
         });
     }
     static active(request, id) {
@@ -144,13 +137,7 @@ class CountryService {
                 },
             });
             return {
-                data: getCountry.map((value) => {
-                    var _a, _b;
-                    return (0, country_model_1.convertToCountryResponse)(value, {
-                        id: (_a = value.created_by) === null || _a === void 0 ? void 0 : _a.id,
-                        name: (_b = value.created_by) === null || _b === void 0 ? void 0 : _b.name,
-                    });
-                }),
+                data: getCountry.map((value) => (0, country_model_1.convertCountryResponse)(value, (0, user_model_1.convertUserGlobalResponse)(value.created_by))),
                 paging: {
                     currentPage: getRequest.page,
                     totalPage: Math.ceil(total / getRequest.size),

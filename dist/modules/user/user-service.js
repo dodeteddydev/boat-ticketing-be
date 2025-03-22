@@ -45,7 +45,7 @@ class UserService {
             const user = yield database_1.prisma.user.create({
                 data: registerRequest,
             });
-            return (0, user_model_1.convertToCreateOrUpdateUserResponse)(user);
+            return (0, user_model_1.convertCreateOrUpdateUserResponse)(user);
         });
     }
     static login(request) {
@@ -66,7 +66,7 @@ class UserService {
                 throw new errorResponse_1.ErrorResponse(400, "User login failed", "Invalid username/email or password. Please try again!");
             const accessToken = jwtHelpers_1.JwtHelpers.generateToken(user.id.toString()).access;
             const refreshToken = jwtHelpers_1.JwtHelpers.generateToken(user.id.toString()).refresh;
-            return (0, user_model_1.convertToLoginResponse)(user, accessToken, refreshToken);
+            return (0, user_model_1.convertLoginResponse)(user, accessToken, refreshToken);
         });
     }
     static get(request) {
@@ -79,7 +79,7 @@ class UserService {
             if (!user) {
                 throw new errorResponse_1.ErrorResponse(404, "User not found", "User with this ID doesn't exist!");
             }
-            return (0, user_model_1.convertToUserResponse)(user, null);
+            return (0, user_model_1.convertUserResponse)(user, null);
         });
     }
     static refresh(request) {
