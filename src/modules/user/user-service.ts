@@ -5,9 +5,9 @@ import { ErrorResponse } from "../../utilities/errorResponse";
 import { JwtHelpers } from "../../utilities/jwtHelpers";
 import { validation } from "../../utilities/validation";
 import {
-  convertToCreateOrUpdateUserResponse,
-  convertToLoginResponse,
-  convertToUserResponse,
+  convertCreateOrUpdateUserResponse,
+  convertLoginResponse,
+  convertUserResponse,
   CreateOrUpdateUserRequest,
   CreateOrUpdateUserResponse,
   LoginRequest,
@@ -54,7 +54,7 @@ export class UserService {
       data: registerRequest,
     });
 
-    return convertToCreateOrUpdateUserResponse(user);
+    return convertCreateOrUpdateUserResponse(user);
   }
 
   static async login(request: LoginRequest): Promise<LoginResponse> {
@@ -91,7 +91,7 @@ export class UserService {
     const accessToken = JwtHelpers.generateToken(user.id.toString()).access;
     const refreshToken = JwtHelpers.generateToken(user.id.toString()).refresh;
 
-    return convertToLoginResponse(user, accessToken, refreshToken);
+    return convertLoginResponse(user, accessToken, refreshToken);
   }
 
   static async get(request: AuthRequest): Promise<UserResponse> {
@@ -108,7 +108,7 @@ export class UserService {
         "User with this ID doesn't exist!"
       );
     }
-    return convertToUserResponse(user, null);
+    return convertUserResponse(user, null);
   }
 
   static async refresh(request: RefreshRequest): Promise<RefreshResponse> {

@@ -39,8 +39,8 @@ model Country {
   id Int @id @default(autoincrement())
   country_name String @db.VarChar(100)
   country_code String @db.VarChar(100)
-  created_by_id Int?
-  created_by User? @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
+  created_by_id Int
+  created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   province Province[]
   city City[]
   port Port[]
@@ -65,7 +65,7 @@ model Province {
   booking Booking[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("province")
 }
@@ -84,7 +84,7 @@ model City {
   booking Booking[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("city")
 }
@@ -144,7 +144,7 @@ model Category {
   boat Boat[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("category")
 }
@@ -160,7 +160,7 @@ model Boat {
   schedule Schedule[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("boat")
 }
@@ -181,7 +181,7 @@ model Port {
   schedule_departure Schedule[] @relation("departure_port")
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("port")
 }
@@ -203,7 +203,7 @@ model Schedule {
   booking Booking[]
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("schedule")
 }
@@ -228,7 +228,7 @@ model Booking {
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  active Boolean
+  active Boolean @default(true)
 
   @@map("booking")
 }
