@@ -19,6 +19,17 @@ const user_model_1 = require("../user/user-model");
 const province_model_1 = require("./province-model");
 const province_validation_1 = require("./province-validation");
 class ProvinceService {
+    static checkCountryExist(countryId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const country = yield database_1.prisma.country.findFirst({
+                where: {
+                    id: countryId,
+                },
+            });
+            if (!country)
+                throw new errorResponse_1.ErrorResponse(404, "Failed create province", "Country doesn't exist");
+        });
+    }
     static checkProvinceExist(provinceName, provinceCode) {
         return __awaiter(this, void 0, void 0, function* () {
             const province = yield database_1.prisma.province.findFirst({
@@ -38,6 +49,7 @@ class ProvinceService {
     static create(request, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const createRequest = (0, validation_1.validation)(province_validation_1.ProvinceValidation.create, request);
+            yield this.checkCountryExist(createRequest.countryId);
             yield this.checkProvinceExist(createRequest.provinceName, createRequest.provinceCode);
             const createdProvince = yield database_1.prisma.province.create({
                 data: {
@@ -65,6 +77,7 @@ class ProvinceService {
             }
             if (updateRequest.provinceName !== existingProvince.province_name &&
                 updateRequest.provinceCode !== existingProvince.province_code) {
+                yield this.checkCountryExist(updateRequest.countryId);
                 yield this.checkProvinceExist(updateRequest.provinceName, updateRequest.provinceCode);
             }
             const updatedProvince = yield database_1.prisma.province.update({
@@ -109,7 +122,7 @@ class ProvinceService {
             const filters = [];
             if (getRequest.countryId) {
                 filters.push({
-                    country_id: getRequest.countryId,
+                    country_id: Number(getRequest.countryId),
                 });
             }
             if (getRequest.search) {
