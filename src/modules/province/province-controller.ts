@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../../middlewares/authMiddleware";
-import { ResponseHelpers } from "../../utilities/responseHelpers";
-import { ProvinceRequest, FilterProvinceRequest } from "./province-model";
-import { ProvinceService } from "./province-service";
 import { ActiveRequest } from "../../types/activeRequest";
+import { ResponseHelpers } from "../../utilities/responseHelpers";
+import { FilterProvinceRequest, ProvinceRequest } from "./province-model";
+import { ProvinceService } from "./province-service";
 
 export class ProvinceController {
   static async create(req: AuthRequest, res: Response, next: NextFunction) {

@@ -1,6 +1,6 @@
 import express from "express";
-import { ProvinceController } from "./province-controller";
 import { authMiddleware } from "../../middlewares/authMiddleware";
+import { ProvinceController } from "./province-controller";
 
 export const provinceRoute = express.Router();
 
