@@ -1,6 +1,6 @@
 import { Province } from "@prisma/client";
-import { UserGlobalResponse } from "../user/user-model";
 import { CountryGlobalResponse } from "../country/country-model";
+import { UserGlobalResponse } from "../user/user-model";
 
 export type ProvinceGlobalResponse = {
   id: number;

@@ -1,5 +1,4 @@
 import { prisma } from "../../config/database";
-import { logger } from "../../config/logger";
 import { ActiveRequest } from "../../types/activeRequest";
 import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
@@ -9,9 +8,9 @@ import { convertCountryGlobalResponse } from "../country/country-model";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
   convertProvinceResponse,
+  FilterProvinceRequest,
   ProvinceRequest,
   ProvinceResponse,
-  FilterProvinceRequest,
 } from "./province-model";
 import { ProvinceValidation } from "./province-validation";
 
@@ -117,6 +116,7 @@ export class ProvinceService {
       data: {
         province_name: updateRequest.provinceName,
         province_code: updateRequest.provinceCode,
+        country: { connect: { id: Number(updateRequest.countryId) } },
       },
       include: {
         created_by: true,
