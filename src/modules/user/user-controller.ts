@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthRequest } from "../../middlewares/authMiddleware";
+import { ResponseHelpers } from "../../utilities/responseHelpers";
 import {
   CreateOrUpdateUserRequest,
   LoginRequest,
   RefreshRequest,
 } from "./user-model";
 import { UserService } from "./user-service";
-import { ResponseHelpers } from "../../utilities/responseHelpers";
-import { AuthRequest } from "../../middlewares/authMiddleware";
 
 export class UserController {
   static async register(req: Request, res: Response, next: NextFunction) {
