@@ -73,7 +73,6 @@ model Province {
 model City {
   id Int @id @default(autoincrement())
   city_name String @db.VarChar(100)
-  city_code String @db.VarChar(100)
   country_id Int
   country Country @relation(fields: [country_id], references: [id], onDelete: Cascade)
   province_id Int

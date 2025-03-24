@@ -5,6 +5,7 @@ import { userRoute } from "./modules/user/user-route";
 import cors from "cors";
 import { countryRoute } from "./modules/country/country-route";
 import { provinceRoute } from "./modules/province/province-route";
+import { cityRoute } from "./modules/city/city-route";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -19,6 +20,7 @@ app.use(cors());
 app.use(userRoute);
 app.use(countryRoute);
 app.use(provinceRoute);
+app.use(cityRoute);
 
 // MIDDLEWARE
 app.use(notFoundMiddleware);
