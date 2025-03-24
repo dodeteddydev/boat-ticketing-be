@@ -38,7 +38,7 @@ enum TransactionType {
 model Country {
   id Int @id @default(autoincrement())
   country_name String @db.VarChar(100)
-  country_code String @db.VarChar(100)
+  country_code String @db.VarChar(100) @unique
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   province Province[]
@@ -55,7 +55,7 @@ model Country {
 model Province {
   id Int @id @default(autoincrement())
   province_name String @db.VarChar(100)
-  province_code String @db.VarChar(100)
+  province_code String? @db.VarChar(100)
   country_id Int
   country Country @relation(fields: [country_id], references: [id], onDelete: Cascade)
   created_by_id Int

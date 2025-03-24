@@ -5,13 +5,13 @@ import { UserGlobalResponse } from "../user/user-model";
 export type ProvinceGlobalResponse = {
   id: number;
   provinceName: string;
-  provinceCode: string;
+  provinceCode: string | null;
 };
 
 export type ProvinceResponse = {
   id: number;
   provinceName: string;
-  provinceCode: string;
+  provinceCode: string | null;
   country: CountryGlobalResponse;
   createdBy: UserGlobalResponse | null;
   createdAt: string;
