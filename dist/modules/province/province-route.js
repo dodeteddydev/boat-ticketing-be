@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.provinceRoute = void 0;
 const express_1 = __importDefault(require("express"));
-const province_controller_1 = require("./province-controller");
 const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const province_controller_1 = require("./province-controller");
 exports.provinceRoute = express_1.default.Router();
 exports.provinceRoute.post("/api/province", authMiddleware_1.authMiddleware, province_controller_1.ProvinceController.create);
 exports.provinceRoute.put("/api/province/:id", authMiddleware_1.authMiddleware, province_controller_1.ProvinceController.update);

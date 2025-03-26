@@ -121,7 +121,6 @@ class CountryService {
             }
             const getCountry = yield database_1.prisma.country.findMany({
                 where: {
-                    active: true,
                     AND: filters,
                 },
                 take: getRequest.size,
@@ -132,7 +131,6 @@ class CountryService {
             });
             const total = yield database_1.prisma.country.count({
                 where: {
-                    active: true,
                     AND: filters,
                 },
             });

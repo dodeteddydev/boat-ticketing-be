@@ -85,6 +85,7 @@ class ProvinceService {
                 data: {
                     province_name: updateRequest.provinceName,
                     province_code: updateRequest.provinceCode,
+                    country: { connect: { id: Number(updateRequest.countryId) } },
                 },
                 include: {
                     created_by: true,
@@ -143,7 +144,6 @@ class ProvinceService {
             }
             const getProvince = yield database_1.prisma.province.findMany({
                 where: {
-                    active: true,
                     AND: filters,
                 },
                 take: getRequest.size,
@@ -155,7 +155,6 @@ class ProvinceService {
             });
             const total = yield database_1.prisma.province.count({
                 where: {
-                    active: true,
                     AND: filters,
                 },
             });

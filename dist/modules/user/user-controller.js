@@ -10,8 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
-const user_service_1 = require("./user-service");
 const responseHelpers_1 = require("../../utilities/responseHelpers");
+const user_service_1 = require("./user-service");
 class UserController {
     static register(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {

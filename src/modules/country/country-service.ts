@@ -163,7 +163,6 @@ export class CountryService {
 
     const getCountry = await prisma.country.findMany({
       where: {
-        active: true,
         AND: filters,
       },
       take: getRequest.size,
@@ -175,7 +174,6 @@ export class CountryService {
 
     const total = await prisma.country.count({
       where: {
-        active: true,
         AND: filters,
       },
     });

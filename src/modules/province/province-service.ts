@@ -195,7 +195,6 @@ export class ProvinceService {
 
     const getProvince = await prisma.province.findMany({
       where: {
-        active: true,
         AND: filters,
       },
       take: getRequest.size,
@@ -208,7 +207,6 @@ export class ProvinceService {
 
     const total = await prisma.province.count({
       where: {
-        active: true,
         AND: filters,
       },
     });
