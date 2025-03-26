@@ -165,6 +165,9 @@ export class CountryService {
       where: {
         AND: filters,
       },
+      orderBy: {
+        created_at: "desc",
+      },
       take: getRequest.size,
       skip: skip,
       include: {
