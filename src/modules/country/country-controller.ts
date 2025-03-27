@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../../middlewares/authMiddleware";
+import { ActiveRequest } from "../../types/activeRequest";
 import { ResponseHelpers } from "../../utilities/responseHelpers";
 import { CountryRequest, FilterCountryRequest } from "./country-model";
 import { CountryService } from "./country-service";
-import { ActiveRequest } from "../../types/activeRequest";
 
 export class CountryController {
   static async create(req: AuthRequest, res: Response, next: NextFunction) {
@@ -84,6 +84,7 @@ export class CountryController {
         search: req.query.search as string,
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
+        all: req.query.all === "true",
       } as FilterCountryRequest;
 
       const response = await CountryService.get(request);

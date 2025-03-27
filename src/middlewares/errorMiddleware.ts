@@ -17,8 +17,8 @@ export const errorMiddleware = (
         ResponseHelpers.error(
           "Validation Error",
           err.errors.length > 1
-            ? err.errors.map((e) => e.message)
-            : err.errors[0].message
+            ? err.errors.map((e) => `${e.path}: ${e.message}`)
+            : `${err.errors[0].path}: ${err.errors[0].message}`
         )
       );
   } else if (err instanceof ErrorResponse) {

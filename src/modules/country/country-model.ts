@@ -26,6 +26,7 @@ export type FilterCountryRequest = {
   search?: string;
   page: number;
   size: number;
+  all?: boolean;
 };
 
 export const convertCountryResponse = (

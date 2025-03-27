@@ -140,6 +140,7 @@ export class CountryService {
     request: FilterCountryRequest
   ): Promise<Pageable<CountryResponse>> {
     const getRequest = validation(CountryValidation.get, request);
+
     const skip = (getRequest.page - 1) * getRequest.size;
 
     const filters = [];
@@ -168,8 +169,8 @@ export class CountryService {
       orderBy: {
         created_at: "desc",
       },
-      take: getRequest.size,
-      skip: skip,
+      take: getRequest.all ? undefined : getRequest.size,
+      skip: getRequest.all ? undefined : skip,
       include: {
         created_by: true,
       },
@@ -188,11 +189,13 @@ export class CountryService {
           convertUserGlobalResponse(value.created_by)
         )
       ),
-      paging: {
-        currentPage: getRequest.page,
-        totalPage: Math.ceil(total / getRequest.size),
-        size: getRequest.size,
-      },
+      paging: getRequest.all
+        ? undefined
+        : {
+            currentPage: getRequest.page,
+            totalPage: Math.ceil(total / getRequest.size),
+            size: getRequest.size,
+          },
     };
   }
 
