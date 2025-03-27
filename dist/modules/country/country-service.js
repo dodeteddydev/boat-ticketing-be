@@ -123,8 +123,11 @@ class CountryService {
                 where: {
                     AND: filters,
                 },
-                take: getRequest.size,
-                skip: skip,
+                orderBy: {
+                    created_at: "desc",
+                },
+                take: getRequest.all ? undefined : getRequest.size,
+                skip: getRequest.all ? undefined : skip,
                 include: {
                     created_by: true,
                 },
@@ -136,11 +139,13 @@ class CountryService {
             });
             return {
                 data: getCountry.map((value) => (0, country_model_1.convertCountryResponse)(value, (0, user_model_1.convertUserGlobalResponse)(value.created_by))),
-                paging: {
-                    currentPage: getRequest.page,
-                    totalPage: Math.ceil(total / getRequest.size),
-                    size: getRequest.size,
-                },
+                paging: getRequest.all
+                    ? undefined
+                    : {
+                        currentPage: getRequest.page,
+                        totalPage: Math.ceil(total / getRequest.size),
+                        size: getRequest.size,
+                    },
             };
         });
     }

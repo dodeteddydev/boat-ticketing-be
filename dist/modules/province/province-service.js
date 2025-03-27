@@ -146,6 +146,9 @@ class ProvinceService {
                 where: {
                     AND: filters,
                 },
+                orderBy: {
+                    created_at: "desc",
+                },
                 take: getRequest.size,
                 skip: skip,
                 include: {

@@ -16,8 +16,26 @@ CountryValidation.create = zod_1.z.object({
         .min(1, "Country code must be at least 1 character"),
 });
 CountryValidation.update = _a.create;
-CountryValidation.get = zod_1.z.object({
+CountryValidation.get = zod_1.z
+    .object({
     search: zod_1.z.string().min(1).optional(),
-    page: zod_1.z.number().min(1).positive(),
-    size: zod_1.z.number().min(1).max(100).positive(),
+    page: zod_1.z.number().min(1).positive().optional(),
+    size: zod_1.z.number().min(1).max(100).positive().optional(),
+    all: zod_1.z.boolean().optional(),
+})
+    .superRefine((data, ctx) => {
+    if (!data.all) {
+        if (!data.page) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["page"],
+            });
+        }
+        if (!data.size) {
+            ctx.addIssue({
+                code: "custom",
+                path: ["size"],
+            });
+        }
+    }
 });

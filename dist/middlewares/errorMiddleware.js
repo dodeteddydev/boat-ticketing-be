@@ -10,8 +10,8 @@ const errorMiddleware = (err, req, res, next) => {
         res
             .status(400)
             .json(responseHelpers_1.ResponseHelpers.error("Validation Error", err.errors.length > 1
-            ? err.errors.map((e) => e.message)
-            : err.errors[0].message));
+            ? err.errors.map((e) => `${e.path}: ${e.message}`)
+            : `${err.errors[0].path}: ${err.errors[0].message}`));
     }
     else if (err instanceof errorResponse_1.ErrorResponse) {
         res.status(err.status).json(responseHelpers_1.ResponseHelpers.error(err.message, err.errors));

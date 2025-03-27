@@ -78,6 +78,7 @@ class CountryController {
                     search: req.query.search,
                     page: req.query.page ? Number(req.query.page) : 1,
                     size: req.query.size ? Number(req.query.size) : 10,
+                    all: req.query.all === "true",
                 };
                 const response = yield country_service_1.CountryService.get(request);
                 res
