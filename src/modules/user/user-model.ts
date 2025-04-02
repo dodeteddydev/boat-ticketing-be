@@ -49,6 +49,13 @@ export type CreateOrUpdateUserRequest = {
   password: string;
 };
 
+export type FilterUserRequest = {
+  search?: string;
+  page: number;
+  size: number;
+  all?: boolean;
+};
+
 export type LoginRequest = {
   identifier: string;
   password: string;

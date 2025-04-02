@@ -31,4 +31,28 @@ export class UserValidation {
   static refresh: ZodType = z.object({
     refreshToken: z.string({ required_error: "Refresh token is required" }),
   });
+
+  static getListUser: ZodType = z
+    .object({
+      search: z.string().min(1).optional(),
+      page: z.number().min(1).positive().optional(),
+      size: z.number().min(1).max(100).positive().optional(),
+      all: z.boolean().optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (!data.all) {
+        if (!data.page) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["page"],
+          });
+        }
+        if (!data.size) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["size"],
+          });
+        }
+      }
+    });
 }

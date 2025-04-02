@@ -7,9 +7,11 @@ import { validation } from "../../utilities/validation";
 import {
   convertCreateOrUpdateUserResponse,
   convertLoginResponse,
+  convertUserGlobalResponse,
   convertUserResponse,
   CreateOrUpdateUserRequest,
   CreateOrUpdateUserResponse,
+  FilterUserRequest,
   LoginRequest,
   LoginResponse,
   RefreshRequest,
@@ -17,6 +19,7 @@ import {
   UserResponse,
 } from "./user-model";
 import { UserValidation } from "./user-validation";
+import { Pageable } from "../../types/pageable";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -109,6 +112,60 @@ export class UserService {
       );
     }
     return convertUserResponse(user, null);
+  }
+
+  static async getListUser(
+    request: FilterUserRequest
+  ): Promise<Pageable<UserResponse>> {
+    const getListUserRequest = validation(UserValidation.getListUser, request);
+
+    const skip = (getListUserRequest.page - 1) * getListUserRequest.size;
+
+    const filters = [];
+
+    if (getListUserRequest.search) {
+      filters.push({
+        name: {
+          contains: getListUserRequest.search,
+        },
+      });
+    }
+
+    const getUser = await prisma.user.findMany({
+      where: {
+        AND: filters,
+      },
+      orderBy: {
+        created_at: "desc",
+      },
+      include: {
+        created_by: true,
+      },
+      take: getListUserRequest.all ? undefined : getListUserRequest.size,
+      skip: getListUserRequest.all ? undefined : skip,
+    });
+
+    const total = await prisma.user.count({
+      where: {
+        AND: filters,
+      },
+    });
+
+    return {
+      data: getUser.map((value) =>
+        convertUserResponse(
+          value,
+          value.created_by ? convertUserGlobalResponse(value.created_by) : null
+        )
+      ),
+      paging: getListUserRequest.all
+        ? undefined
+        : {
+            currentPage: getListUserRequest.page,
+            totalPage: Math.ceil(total / getListUserRequest.size),
+            size: getListUserRequest.size,
+          },
+    };
   }
 
   static async refresh(request: RefreshRequest): Promise<RefreshResponse> {

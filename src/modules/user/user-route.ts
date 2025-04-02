@@ -8,3 +8,4 @@ userRoute.post("/api/auth/register", UserController.register);
 userRoute.post("/api/auth/login", UserController.login);
 userRoute.post("/api/auth/refresh", UserController.refresh);
 userRoute.get("/api/user/profile", authMiddleware, UserController.get);
+userRoute.get("/api/user", authMiddleware, UserController.getListUser);
