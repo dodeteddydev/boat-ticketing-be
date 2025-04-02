@@ -13,10 +13,28 @@ export class ProvinceValidation {
 
   static update: ZodType = this.create;
 
-  static get: ZodType = z.object({
-    search: z.string().min(1).optional(),
-    countryId: z.number().min(1).optional(),
-    page: z.number().min(1).positive(),
-    size: z.number().min(1).max(100).positive(),
-  });
+  static get: ZodType = z
+    .object({
+      search: z.string().min(1).optional(),
+      countryId: z.number().min(1).optional(),
+      page: z.number().min(1).positive(),
+      size: z.number().min(1).max(100).positive(),
+      all: z.boolean().optional(),
+    })
+    .superRefine((data, ctx) => {
+      if (!data.all) {
+        if (!data.page) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["page"],
+          });
+        }
+        if (!data.size) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["size"],
+          });
+        }
+      }
+    });
 }

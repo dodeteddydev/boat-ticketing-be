@@ -194,8 +194,8 @@ export class CityService {
       orderBy: {
         created_at: "desc",
       },
-      take: getRequest.size,
-      skip: skip,
+      take: getRequest.all ? undefined : getRequest.size,
+      skip: getRequest.all ? undefined : skip,
       include: {
         created_by: true,
         country: true,
@@ -218,11 +218,13 @@ export class CityService {
           convertProvinceGlobalResponse(value.province)
         )
       ),
-      paging: {
-        currentPage: getRequest.page,
-        totalPage: Math.ceil(total / getRequest.size),
-        size: getRequest.size,
-      },
+      paging: getRequest.all
+        ? undefined
+        : {
+            currentPage: getRequest.page,
+            totalPage: Math.ceil(total / getRequest.size),
+            size: getRequest.size,
+          },
     };
   }
 

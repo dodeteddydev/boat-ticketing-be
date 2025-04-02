@@ -200,8 +200,8 @@ export class ProvinceService {
       orderBy: {
         created_at: "desc",
       },
-      take: getRequest.size,
-      skip: skip,
+      take: getRequest.all ? undefined : getRequest.size,
+      skip: getRequest.all ? undefined : skip,
       include: {
         created_by: true,
         country: true,
@@ -222,11 +222,13 @@ export class ProvinceService {
           convertCountryGlobalResponse(value.country)
         )
       ),
-      paging: {
-        currentPage: getRequest.page,
-        totalPage: Math.ceil(total / getRequest.size),
-        size: getRequest.size,
-      },
+      paging: getRequest.all
+        ? undefined
+        : {
+            currentPage: getRequest.page,
+            totalPage: Math.ceil(total / getRequest.size),
+            size: getRequest.size,
+          },
     };
   }
 

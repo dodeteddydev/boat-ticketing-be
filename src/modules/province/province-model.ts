@@ -30,6 +30,7 @@ export type FilterProvinceRequest = {
   countryId?: number;
   page: number;
   size: number;
+  all?: boolean;
 };
 
 export const convertProvinceResponse = (

@@ -33,6 +33,7 @@ export type FilterCityRequest = {
   provinceId?: number;
   page: number;
   size: number;
+  all?: boolean;
 };
 
 export const convertCityResponse = (

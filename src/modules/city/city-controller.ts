@@ -82,6 +82,7 @@ export class CityController {
         provinceId: req.query.provinceId && Number(req.query.provinceId),
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
+        all: req.query.all === "true",
       } as FilterCityRequest;
 
       const response = await CityService.get(request);

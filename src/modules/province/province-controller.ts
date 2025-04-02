@@ -85,6 +85,7 @@ export class ProvinceController {
         countryId: req.query.countryId && Number(req.query.countryId),
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
+        all: req.query.all === "true",
       } as FilterProvinceRequest;
 
       const response = await ProvinceService.get(request);
