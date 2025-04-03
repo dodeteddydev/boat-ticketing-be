@@ -106,6 +106,8 @@ model User {
   schedule Schedule[]
   booking Booking[]
   created_by_id Int?
+  created_by    User?    @relation("user_created_by", fields: [created_by_id], references: [id])
+  created_users User[]   @relation("user_created_by")
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   active Boolean @default(true)

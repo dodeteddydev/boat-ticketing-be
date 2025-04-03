@@ -1,7 +1,7 @@
 import { Role, Status, User } from "@prisma/client";
 
 export type UserGlobalResponse = {
-  id: number;
+  id: number | null;
   name: string;
 };
 
@@ -12,36 +12,13 @@ export type UserResponse = {
   username: string;
   email: string;
   status: Status;
-  createdBy: UserGlobalResponse | null;
+  createdBy?: UserGlobalResponse;
   createdAt: string;
   updatedAt: string;
   active: boolean;
 };
 
-export type CreateOrUpdateUserResponse = {
-  id: number;
-  role: Role;
-  name: string;
-  username: string;
-  email: string;
-};
-
-export type LoginResponse = {
-  id: number;
-  role: Role;
-  name: string;
-  username: string;
-  email: string;
-  accessToken: string;
-  refreshToken: string;
-};
-
-export type RefreshResponse = {
-  accessToken: string;
-  refreshToken: string;
-};
-
-export type CreateOrUpdateUserRequest = {
+export type UserRequest = {
   role: Role;
   name: string;
   username: string;
@@ -49,46 +26,16 @@ export type CreateOrUpdateUserRequest = {
   password: string;
 };
 
-export type LoginRequest = {
-  identifier: string;
-  password: string;
-};
-
-export type RefreshRequest = {
-  refreshToken: string;
-};
-
-export const convertLoginResponse = (
-  user: User,
-  accessToken: string,
-  refreshToken: string
-): LoginResponse => {
-  return {
-    id: user.id,
-    role: user.role,
-    name: user.name,
-    username: user.username,
-    email: user.email,
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-  };
-};
-
-export const convertCreateOrUpdateUserResponse = (
-  user: User
-): CreateOrUpdateUserResponse => {
-  return {
-    id: user.id,
-    role: user.role,
-    name: user.name,
-    username: user.username,
-    email: user.email,
-  };
+export type FilterUserRequest = {
+  search?: string;
+  page: number;
+  size: number;
+  all?: boolean;
 };
 
 export const convertUserResponse = (
   user: User,
-  createdBy: UserGlobalResponse | null
+  createdBy?: UserGlobalResponse
 ): UserResponse => {
   return {
     id: user.id,
