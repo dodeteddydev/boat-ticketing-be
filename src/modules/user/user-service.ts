@@ -1,25 +1,18 @@
 import bcrypt from "bcrypt";
 import { prisma } from "../../config/database";
-import { AuthRequest } from "../../middlewares/authMiddleware";
+import { ActiveRequest } from "../../types/activeRequest";
+import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
-import { JwtHelpers } from "../../utilities/jwtHelpers";
 import { validation } from "../../utilities/validation";
+import { activeValidation } from "../../validation/activeValidation";
 import {
-  convertCreateOrUpdateUserResponse,
-  convertLoginResponse,
   convertUserGlobalResponse,
   convertUserResponse,
-  CreateOrUpdateUserRequest,
-  CreateOrUpdateUserResponse,
   FilterUserRequest,
-  LoginRequest,
-  LoginResponse,
-  RefreshRequest,
-  RefreshResponse,
+  UserRequest,
   UserResponse,
 } from "./user-model";
 import { UserValidation } from "./user-validation";
-import { Pageable } from "../../types/pageable";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -31,102 +24,127 @@ export class UserService {
 
     const errorMessage =
       user?.name === name
-        ? "Name is already registered"
+        ? "Name is already exist"
         : user?.username === username
-        ? "Username is already registered"
-        : "Email is already registered";
+        ? "Username is already exist"
+        : "Email is already exist";
 
-    if (user)
-      throw new ErrorResponse(400, "User registration failed", errorMessage);
+    if (user) throw new ErrorResponse(400, "Failed create user", errorMessage);
   }
 
-  static async register(
-    request: CreateOrUpdateUserRequest
-  ): Promise<CreateOrUpdateUserResponse> {
-    const registerRequest = validation(UserValidation.register, request);
+  static async create(
+    request: UserRequest,
+    userId: number
+  ): Promise<UserResponse> {
+    const createRequest = validation(UserValidation.create, request);
 
     await this.checkUserExist(
-      registerRequest.name,
-      registerRequest.username,
-      registerRequest.email
+      createRequest.name,
+      createRequest.username,
+      createRequest.email
     );
 
-    registerRequest.password = await bcrypt.hash(registerRequest.password, 10);
+    createRequest.password = await bcrypt.hash(createRequest.password, 10);
 
-    const user = await prisma.user.create({
-      data: registerRequest,
-    });
-
-    return convertCreateOrUpdateUserResponse(user);
-  }
-
-  static async login(request: LoginRequest): Promise<LoginResponse> {
-    const loginRequest = validation(UserValidation.login, request);
-
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username: loginRequest.identifier },
-          { email: loginRequest.identifier },
-        ],
+    const createdUser = await prisma.user.create({
+      data: { ...createRequest, created_by_id: Number(userId) },
+      include: {
+        created_by: true,
       },
     });
 
-    if (!user)
-      throw new ErrorResponse(
-        400,
-        "User login failed",
-        "No account found. Please sign up to continue."
-      );
-
-    const isValidPassword = await bcrypt.compare(
-      loginRequest.password,
-      user.password
+    return convertUserResponse(
+      createdUser,
+      createdUser.created_by
+        ? convertUserGlobalResponse(createdUser.created_by)
+        : { id: null, name: "" }
     );
-
-    if (!isValidPassword)
-      throw new ErrorResponse(
-        400,
-        "User login failed",
-        "Invalid username/email or password. Please try again!"
-      );
-
-    const accessToken = JwtHelpers.generateToken(user.id.toString()).access;
-    const refreshToken = JwtHelpers.generateToken(user.id.toString()).refresh;
-
-    return convertLoginResponse(user, accessToken, refreshToken);
   }
 
-  static async get(request: AuthRequest): Promise<UserResponse> {
-    const user = await prisma.user.findUnique({
-      where: {
-        id: Number(request.userId),
-      },
+  static async update(request: UserRequest, id: number): Promise<UserResponse> {
+    const updateRequest = validation(UserValidation.create, request);
+
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
     });
 
-    if (!user) {
+    if (!existingUser) {
       throw new ErrorResponse(
         404,
         "User not found",
         "User with this ID doesn't exist!"
       );
     }
-    return convertUserResponse(user, null);
+
+    if (
+      updateRequest.name !== existingUser.name &&
+      updateRequest.username !== existingUser.username &&
+      updateRequest.email !== existingUser.email
+    ) {
+      await this.checkUserExist(
+        updateRequest.name,
+        updateRequest.username,
+        updateRequest.email
+      );
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: updateRequest,
+      include: {
+        created_by: true,
+      },
+    });
+
+    return convertUserResponse(
+      updatedUser,
+      updatedUser.created_by
+        ? convertUserGlobalResponse(updatedUser.created_by)
+        : { id: null, name: "" }
+    );
   }
 
-  static async getListUser(
+  static async active(
+    request: ActiveRequest,
+    id: number
+  ): Promise<{ active: boolean }> {
+    const activeRequest = validation(activeValidation, request);
+
+    const existingCountry = await prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!existingCountry) {
+      throw new ErrorResponse(
+        404,
+        "Country not found",
+        "Country with this ID doesn't exist!"
+      );
+    }
+
+    const updatedActive = await prisma.user.update({
+      where: { id },
+      data: {
+        active: activeRequest.active,
+      },
+    });
+
+    return { active: updatedActive.active };
+  }
+
+  static async get(
     request: FilterUserRequest
   ): Promise<Pageable<UserResponse>> {
-    const getListUserRequest = validation(UserValidation.getListUser, request);
+    const getRequest = validation(UserValidation.get, request);
 
-    const skip = (getListUserRequest.page - 1) * getListUserRequest.size;
+    const skip = (getRequest.page - 1) * getRequest.size;
 
     const filters = [];
 
-    if (getListUserRequest.search) {
+    if (getRequest.search) {
       filters.push({
         name: {
-          contains: getListUserRequest.search,
+          contains: getRequest.search,
         },
       });
     }
@@ -141,8 +159,8 @@ export class UserService {
       include: {
         created_by: true,
       },
-      take: getListUserRequest.all ? undefined : getListUserRequest.size,
-      skip: getListUserRequest.all ? undefined : skip,
+      take: getRequest.all ? undefined : getRequest.size,
+      skip: getRequest.all ? undefined : skip,
     });
 
     const total = await prisma.user.count({
@@ -155,32 +173,38 @@ export class UserService {
       data: getUser.map((value) =>
         convertUserResponse(
           value,
-          value.created_by ? convertUserGlobalResponse(value.created_by) : null
+          value.created_by
+            ? convertUserGlobalResponse(value.created_by)
+            : { id: null, name: "" }
         )
       ),
-      paging: getListUserRequest.all
+      paging: getRequest.all
         ? undefined
         : {
-            currentPage: getListUserRequest.page,
-            totalPage: Math.ceil(total / getListUserRequest.size),
-            size: getListUserRequest.size,
+            currentPage: getRequest.page,
+            totalPage: Math.ceil(total / getRequest.size),
+            size: getRequest.size,
           },
     };
   }
 
-  static async refresh(request: RefreshRequest): Promise<RefreshResponse> {
-    const refreshRequest = validation(UserValidation.refresh, request);
+  static async delete(id: number): Promise<string> {
+    const existingUser = await prisma.user.findUnique({
+      where: { id },
+    });
 
-    const decode = JwtHelpers.verifyRefreshToken(refreshRequest.refreshToken);
+    if (!existingUser) {
+      throw new ErrorResponse(
+        404,
+        "User not found",
+        "User with this ID doesn't exist!"
+      );
+    }
 
-    const userId = decode.userId;
+    await prisma.user.delete({
+      where: { id },
+    });
 
-    const accessToken = JwtHelpers.generateToken(userId.toString()).access;
-    const refreshToken = JwtHelpers.generateToken(userId.toString()).refresh;
-
-    return {
-      accessToken,
-      refreshToken,
-    };
+    return `User with ID ${id} is deleted`;
   }
 }

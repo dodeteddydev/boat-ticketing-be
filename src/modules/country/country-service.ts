@@ -128,9 +128,6 @@ export class CountryService {
       data: {
         active: activeRequest.active,
       },
-      include: {
-        created_by: true,
-      },
     });
 
     return { active: updatedActive.active };
