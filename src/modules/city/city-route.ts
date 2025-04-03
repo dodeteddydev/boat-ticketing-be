@@ -24,7 +24,12 @@ cityRoute.patch(
   featureAccessMiddleware([Role.superadmin]),
   CityController.active
 );
-cityRoute.get("/api/city", authMiddleware, CityController.get);
+cityRoute.get(
+  "/api/city",
+  authMiddleware,
+  featureAccessMiddleware(),
+  CityController.get
+);
 cityRoute.delete(
   "/api/city/:id",
   authMiddleware,

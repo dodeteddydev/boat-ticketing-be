@@ -74,7 +74,7 @@ export class UserController {
     }
   }
 
-  static async get(req: Request, res: Response, next: NextFunction) {
+  static async get(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const request = {
         search: req.query.search as string,
@@ -83,7 +83,7 @@ export class UserController {
         all: req.query.all === "true",
       } as FilterUserRequest;
 
-      const response = await UserService.get(request);
+      const response = await UserService.get(request, req.userId!);
 
       res
         .status(200)

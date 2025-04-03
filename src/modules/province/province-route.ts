@@ -24,7 +24,12 @@ provinceRoute.patch(
   featureAccessMiddleware([Role.superadmin]),
   ProvinceController.active
 );
-provinceRoute.get("/api/province", authMiddleware, ProvinceController.get);
+provinceRoute.get(
+  "/api/province",
+  authMiddleware,
+  featureAccessMiddleware(),
+  ProvinceController.get
+);
 provinceRoute.delete(
   "/api/province/:id",
   authMiddleware,

@@ -24,7 +24,12 @@ countryRoute.patch(
   featureAccessMiddleware([Role.superadmin]),
   CountryController.active
 );
-countryRoute.get("/api/country", authMiddleware, CountryController.get);
+countryRoute.get(
+  "/api/country",
+  authMiddleware,
+  featureAccessMiddleware(),
+  CountryController.get
+);
 countryRoute.delete(
   "/api/country/:id",
   authMiddleware,

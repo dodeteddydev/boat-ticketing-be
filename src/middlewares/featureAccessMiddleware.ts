@@ -5,7 +5,7 @@ import { Role } from "@prisma/client";
 import { ResponseHelpers } from "../utilities/responseHelpers";
 
 export const featureAccessMiddleware =
-  (roles: Role[]): RequestHandler =>
+  (roles?: Role[]): RequestHandler =>
   async (
     req: AuthRequest,
     res: Response,
@@ -23,7 +23,19 @@ export const featureAccessMiddleware =
         return;
       }
 
-      if (!roles.includes(user?.role!)) {
+      if (user.status === "unverified") {
+        res
+          .status(403)
+          .json(
+            ResponseHelpers.error(
+              "Forbidden",
+              "Your account is not verified. Please verify your account to access this feature."
+            )
+          );
+        return;
+      }
+
+      if (roles && !roles.includes(user?.role!)) {
         res
           .status(403)
           .json(

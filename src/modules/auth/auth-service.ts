@@ -73,6 +73,14 @@ export class AuthService {
         "No account found. Please sign up to continue."
       );
 
+    if (!user.active) {
+      throw new ErrorResponse(
+        403,
+        "User login failed",
+        "Your account is inactive. Please contact support for assistance."
+      );
+    }
+
     const isValidPassword = await bcrypt.compare(
       loginRequest.password,
       user.password

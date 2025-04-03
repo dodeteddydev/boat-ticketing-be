@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import bcrypt from "bcrypt";
 import { prisma } from "../../config/database";
 import { ActiveRequest } from "../../types/activeRequest";
@@ -47,7 +48,11 @@ export class UserService {
     createRequest.password = await bcrypt.hash(createRequest.password, 10);
 
     const createdUser = await prisma.user.create({
-      data: { ...createRequest, created_by_id: Number(userId) },
+      data: {
+        ...createRequest,
+        status: "verified",
+        created_by_id: Number(userId),
+      },
       include: {
         created_by: true,
       },
@@ -87,6 +92,8 @@ export class UserService {
         updateRequest.email
       );
     }
+
+    updateRequest.password = await bcrypt.hash(updateRequest.password, 10);
 
     const updatedUser = await prisma.user.update({
       where: { id },
@@ -133,9 +140,14 @@ export class UserService {
   }
 
   static async get(
-    request: FilterUserRequest
+    request: FilterUserRequest,
+    userId: number
   ): Promise<Pageable<UserResponse>> {
     const getRequest = validation(UserValidation.get, request);
+
+    const checkRole = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
 
     const skip = (getRequest.page - 1) * getRequest.size;
 
@@ -151,6 +163,8 @@ export class UserService {
 
     const getUser = await prisma.user.findMany({
       where: {
+        created_by_id:
+          checkRole?.role !== Role.superadmin ? checkRole?.id : undefined,
         AND: filters,
       },
       orderBy: {
