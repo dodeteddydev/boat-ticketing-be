@@ -1,9 +1,11 @@
 import bcrypt from "bcrypt";
+import { Response } from "express";
 import { prisma } from "../../config/database";
 import { AuthRequest } from "../../middlewares/authMiddleware";
 import { ErrorResponse } from "../../utilities/errorResponse";
 import { JwtHelpers } from "../../utilities/jwtHelpers";
 import { validation } from "../../utilities/validation";
+import { convertUserResponse, UserResponse } from "../user/user-model";
 import {
   convertLoginResponse,
   convertRegisterResponse,
@@ -15,7 +17,6 @@ import {
   RegisterResponse,
 } from "./auth-model";
 import { AuthValidation } from "./auth-validation";
-import { convertUserResponse, UserResponse } from "../user/user-model";
 
 export class AuthService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -54,7 +55,10 @@ export class AuthService {
     return convertRegisterResponse(user);
   }
 
-  static async login(request: LoginRequest): Promise<LoginResponse> {
+  static async login(
+    request: LoginRequest,
+    res: Response
+  ): Promise<LoginResponse> {
     const loginRequest = validation(AuthValidation.login, request);
 
     const user = await prisma.user.findFirst({
@@ -96,6 +100,17 @@ export class AuthService {
     const accessToken = JwtHelpers.generateToken(user.id.toString()).access;
     const refreshToken = JwtHelpers.generateToken(user.id.toString()).refresh;
 
+    if (loginRequest.platform === "web") {
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.APP_ENV === "PROD",
+        sameSite: "strict",
+        path: "/",
+      });
+
+      return convertLoginResponse(user, accessToken);
+    }
+
     return convertLoginResponse(user, accessToken, refreshToken);
   }
 
@@ -116,19 +131,56 @@ export class AuthService {
     return convertUserResponse(user);
   }
 
-  static async refresh(request: RefreshRequest): Promise<RefreshResponse> {
-    const refreshRequest = validation(AuthValidation.refresh, request);
+  static async refresh(
+    cookiesRefreshToken: string,
+    res: Response
+  ): Promise<RefreshResponse> {
+    const refreshToken = cookiesRefreshToken;
 
-    const decode = JwtHelpers.verifyRefreshToken(refreshRequest.refreshToken);
+    if (!refreshToken) {
+      throw new ErrorResponse(
+        401,
+        "Refresh failed",
+        "No refresh token provided."
+      );
+    }
 
-    const userId = decode.userId;
+    const decoded = JwtHelpers.verifyRefreshToken(refreshToken);
+    const userId = decoded.userId;
 
-    const accessToken = JwtHelpers.generateToken(userId.toString()).access;
-    const refreshToken = JwtHelpers.generateToken(userId.toString()).refresh;
+    const newAccessToken = JwtHelpers.generateToken(userId.toString()).access;
+    const newRefreshToken = JwtHelpers.generateToken(userId.toString()).refresh;
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.APP_ENV === "PROD",
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return { accessToken: newAccessToken };
+  }
+
+  static async refreshMobile(req: RefreshRequest): Promise<RefreshResponse> {
+    const refreshToken = req.refreshToken;
+
+    if (!refreshToken) {
+      throw new ErrorResponse(
+        401,
+        "Refresh failed",
+        "No refresh token provided."
+      );
+    }
+
+    const decoded = JwtHelpers.verifyRefreshToken(refreshToken);
+    const userId = decoded.userId;
+
+    const newAccessToken = JwtHelpers.generateToken(userId.toString()).access;
+    const newRefreshToken = JwtHelpers.generateToken(userId.toString()).refresh;
 
     return {
-      accessToken,
-      refreshToken,
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
     };
   }
 }
