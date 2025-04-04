@@ -1,4 +1,5 @@
 import { Role, User } from "@prisma/client";
+import { Request } from "express";
 
 export type RegisterResponse = {
   id: number;
@@ -15,12 +16,12 @@ export type LoginResponse = {
   username: string;
   email: string;
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 };
 
 export type RefreshResponse = {
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 };
 
 export type RegisterRequest = {
@@ -32,6 +33,7 @@ export type RegisterRequest = {
 };
 
 export type LoginRequest = {
+  platform?: "mobile" | "web";
   identifier: string;
   password: string;
 };
@@ -43,7 +45,7 @@ export type RefreshRequest = {
 export const convertLoginResponse = (
   user: User,
   accessToken: string,
-  refreshToken: string
+  refreshToken?: string
 ): LoginResponse => {
   return {
     id: user.id,

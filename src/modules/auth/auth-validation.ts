@@ -20,6 +20,7 @@ export class AuthValidation {
   });
 
   static login: ZodType = z.object({
+    platform: z.enum(["mobile", "web"]).optional(),
     identifier: z
       .string({ required_error: "Username or Email is required" })
       .min(1, "Please enter username or email correctly"),

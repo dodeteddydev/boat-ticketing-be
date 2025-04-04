@@ -7,6 +7,7 @@ import { cityRoute } from "./modules/city/city-route";
 import { countryRoute } from "./modules/country/country-route";
 import { provinceRoute } from "./modules/province/province-route";
 import { userRoute } from "./modules/user/user-route";
+import cookieParser from "cookie-parser";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -14,8 +15,13 @@ const PORT = process.env.PORT;
 const app = express();
 
 app.use(express.json());
-
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+  })
+);
 
 // ROUTE
 app.use(authRoute);

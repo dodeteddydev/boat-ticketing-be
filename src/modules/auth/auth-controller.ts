@@ -22,7 +22,7 @@ export class AuthController {
   static async login(req: Request, res: Response, next: NextFunction) {
     try {
       const request = req.body as LoginRequest;
-      const response = await AuthService.login(request);
+      const response = await AuthService.login(request, res);
       res
         .status(201)
         .json(ResponseHelpers.success("User Logged in successfully", response));
@@ -44,8 +44,20 @@ export class AuthController {
 
   static async refresh(req: Request, res: Response, next: NextFunction) {
     try {
+      const cookiesRefreshToken = req.cookies.refreshToken as string;
+      const response = await AuthService.refresh(cookiesRefreshToken, res);
+      res
+        .status(200)
+        .json(ResponseHelpers.success("Refresh token success", response));
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async refreshMobile(req: Request, res: Response, next: NextFunction) {
+    try {
       const request = req.body as RefreshRequest;
-      const response = await AuthService.refresh(request);
+      const response = await AuthService.refreshMobile(request);
       res
         .status(200)
         .json(ResponseHelpers.success("Refresh token success", response));

@@ -9,11 +9,11 @@ const refreshExpires = process.env.JWT_REFRESH_EXPIRES;
 export class JwtHelpers {
   static generateToken(userId: string): { access: string; refresh: string } {
     const access = jwt.sign({ userId }, accessSecret, {
-      expiresIn: `${Number(accessExpires)}m`,
+      expiresIn: `${Number(accessExpires)}s`,
     });
 
     const refresh = jwt.sign({ userId }, refreshSecret, {
-      expiresIn: `${Number(refreshExpires)}m`,
+      expiresIn: `${Number(refreshExpires)}d`,
     });
 
     return { access, refresh };
