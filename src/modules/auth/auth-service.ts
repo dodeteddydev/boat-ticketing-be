@@ -17,6 +17,7 @@ import {
   RegisterResponse,
 } from "./auth-model";
 import { AuthValidation } from "./auth-validation";
+import { WalletService } from "../wallet/wallet-service";
 
 export class AuthService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -40,6 +41,16 @@ export class AuthService {
   static async register(request: RegisterRequest): Promise<RegisterResponse> {
     const registerRequest = validation(AuthValidation.register, request);
 
+    if (
+      registerRequest.role === "superadmin" ||
+      registerRequest.role === "boatadmin"
+    )
+      throw new ErrorResponse(
+        400,
+        "User registration failed",
+        `You are not allowed to register as a ${registerRequest.role}.`
+      );
+
     await this.checkUserExist(
       registerRequest.name,
       registerRequest.username,
@@ -51,6 +62,9 @@ export class AuthService {
     const user = await prisma.user.create({
       data: registerRequest,
     });
+
+    if (user.role === "boatowner" || user.role === "customer")
+      await WalletService.create(user.id);
 
     return convertRegisterResponse(user);
   }
