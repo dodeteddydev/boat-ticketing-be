@@ -14,6 +14,7 @@ import {
   UserResponse,
 } from "./user-model";
 import { UserValidation } from "./user-validation";
+import { WalletService } from "../wallet/wallet-service";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {
@@ -39,6 +40,13 @@ export class UserService {
   ): Promise<UserResponse> {
     const createRequest = validation(UserValidation.create, request);
 
+    if (createRequest.role === "superadmin")
+      throw new ErrorResponse(
+        400,
+        "User registration failed",
+        `You are not allowed to register as a ${createRequest.role}.`
+      );
+
     await this.checkUserExist(
       createRequest.name,
       createRequest.username,
@@ -57,6 +65,9 @@ export class UserService {
         created_by: true,
       },
     });
+
+    if (createdUser.role === "boatowner" || createdUser.role === "customer")
+      await WalletService.create(createdUser.id);
 
     return convertUserResponse(
       createdUser,
