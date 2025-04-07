@@ -5,6 +5,7 @@ import { ErrorResponse } from "../../utilities/errorResponse";
 import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
 import { convertCountryGlobalResponse } from "../country/country-model";
+import { CountryService } from "../country/country-service";
 import { convertProvinceGlobalResponse } from "../province/province-model";
 import { ProvinceService } from "../province/province-service";
 import { convertUserGlobalResponse } from "../user/user-model";
@@ -17,21 +18,6 @@ import {
 import { CityValidation } from "./city-validation";
 
 export class CityService {
-  static async checkProvinceExist(provinceId: number) {
-    const province = await prisma.province.findFirst({
-      where: {
-        id: provinceId,
-      },
-    });
-
-    if (!province)
-      throw new ErrorResponse(
-        404,
-        "Failed create city",
-        "Province doesn't exist"
-      );
-  }
-
   static async checkCityExist(cityName: string) {
     const city = await prisma.city.findFirst({
       where: {
@@ -47,15 +33,33 @@ export class CityService {
     if (city) throw new ErrorResponse(400, "Failed create city", errorMessage);
   }
 
+  static async checkCityExistById(
+    cityId: number
+  ): Promise<{ cityName: string }> {
+    const existingCity = await prisma.city.findUnique({
+      where: { id: cityId },
+    });
+
+    if (!existingCity) {
+      throw new ErrorResponse(
+        404,
+        "City not found",
+        "City with this ID doesn't exist!"
+      );
+    }
+
+    return { cityName: existingCity.city_name };
+  }
+
   static async create(
     request: CityRequest,
     userId: number
   ): Promise<CityResponse> {
     const createRequest = validation(CityValidation.create, request);
 
-    await ProvinceService.checkCountryExist(createRequest.countryId);
+    await CountryService.checkCountryExistById(createRequest.countryId);
 
-    await this.checkProvinceExist(createRequest.provinceId);
+    await ProvinceService.checkProvinceExistById(createRequest.provinceId);
 
     await this.checkCityExist(createRequest.cityName);
 
@@ -84,21 +88,11 @@ export class CityService {
   static async update(request: CityRequest, id: number): Promise<CityResponse> {
     const updateRequest = validation(CityValidation.create, request);
 
-    const existingCity = await prisma.city.findUnique({
-      where: { id },
-    });
+    const { cityName } = await this.checkCityExistById(id);
 
-    if (!existingCity) {
-      throw new ErrorResponse(
-        404,
-        "City not found",
-        "City with this ID doesn't exist!"
-      );
-    }
-
-    if (updateRequest.cityName !== existingCity.city_name) {
-      await ProvinceService.checkCountryExist(updateRequest.countryId);
-      await this.checkProvinceExist(updateRequest.provinceId);
+    if (updateRequest.cityName !== cityName) {
+      await CountryService.checkCountryExistById(updateRequest.countryId);
+      await ProvinceService.checkProvinceExistById(updateRequest.provinceId);
       await this.checkCityExist(updateRequest.cityName);
     }
 
@@ -130,17 +124,7 @@ export class CityService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingCity = await prisma.city.findUnique({
-      where: { id },
-    });
-
-    if (!existingCity) {
-      throw new ErrorResponse(
-        404,
-        "City not found",
-        "City with this ID doesn't exist!"
-      );
-    }
+    await this.checkCityExistById(id);
 
     const updatedActive = await prisma.city.update({
       where: { id },
@@ -226,17 +210,7 @@ export class CityService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingCity = await prisma.city.findUnique({
-      where: { id },
-    });
-
-    if (!existingCity) {
-      throw new ErrorResponse(
-        404,
-        "City not found",
-        "City with this ID doesn't exist!"
-      );
-    }
+    await this.checkCityExistById(id);
 
     await prisma.city.delete({
       where: { id },

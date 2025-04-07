@@ -5,6 +5,7 @@ import { ErrorResponse } from "../../utilities/errorResponse";
 import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
 import { convertCountryGlobalResponse } from "../country/country-model";
+import { CountryService } from "../country/country-service";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
   convertProvinceResponse,
@@ -15,21 +16,6 @@ import {
 import { ProvinceValidation } from "./province-validation";
 
 export class ProvinceService {
-  static async checkCountryExist(countryId: number) {
-    const country = await prisma.country.findFirst({
-      where: {
-        id: countryId,
-      },
-    });
-
-    if (!country)
-      throw new ErrorResponse(
-        404,
-        "Failed create province",
-        "Country doesn't exist"
-      );
-  }
-
   static async checkProvinceExist(provinceName: string, provinceCode: string) {
     const province = await prisma.province.findFirst({
       where: {
@@ -48,13 +34,34 @@ export class ProvinceService {
       throw new ErrorResponse(400, "Failed create province", errorMessage);
   }
 
+  static async checkProvinceExistById(
+    provinceId: number
+  ): Promise<{ provinceName: string; provinceCode: string | null }> {
+    const existingProvince = await prisma.province.findUnique({
+      where: { id: provinceId },
+    });
+
+    if (!existingProvince) {
+      throw new ErrorResponse(
+        404,
+        "Province not found",
+        "Province with this ID doesn't exist!"
+      );
+    }
+
+    return {
+      provinceName: existingProvince.province_name,
+      provinceCode: existingProvince.province_code,
+    };
+  }
+
   static async create(
     request: ProvinceRequest,
     userId: number
   ): Promise<ProvinceResponse> {
     const createRequest = validation(ProvinceValidation.create, request);
 
-    await this.checkCountryExist(createRequest.countryId);
+    await CountryService.checkCountryExistById(createRequest.countryId);
 
     await this.checkProvinceExist(
       createRequest.provinceName,
@@ -87,23 +94,15 @@ export class ProvinceService {
   ): Promise<ProvinceResponse> {
     const updateRequest = validation(ProvinceValidation.create, request);
 
-    const existingProvince = await prisma.province.findUnique({
-      where: { id },
-    });
-
-    if (!existingProvince) {
-      throw new ErrorResponse(
-        404,
-        "Province not found",
-        "Province with this ID doesn't exist!"
-      );
-    }
+    const { provinceName, provinceCode } = await this.checkProvinceExistById(
+      id
+    );
 
     if (
-      updateRequest.provinceName !== existingProvince.province_name &&
-      updateRequest.provinceCode !== existingProvince.province_code
+      updateRequest.provinceName !== provinceName &&
+      updateRequest.provinceCode !== provinceCode
     ) {
-      await this.checkCountryExist(updateRequest.countryId);
+      await CountryService.checkCountryExistById(updateRequest.countryId);
 
       await this.checkProvinceExist(
         updateRequest.provinceName,
@@ -137,17 +136,7 @@ export class ProvinceService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingProvince = await prisma.province.findUnique({
-      where: { id },
-    });
-
-    if (!existingProvince) {
-      throw new ErrorResponse(
-        404,
-        "Province not found",
-        "Province with this ID doesn't exist!"
-      );
-    }
+    await this.checkProvinceExistById(id);
 
     const updatedActive = await prisma.province.update({
       where: { id },
@@ -230,17 +219,7 @@ export class ProvinceService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingProvince = await prisma.province.findUnique({
-      where: { id },
-    });
-
-    if (!existingProvince) {
-      throw new ErrorResponse(
-        404,
-        "Province not found",
-        "Province with this ID doesn't exist!"
-      );
-    }
+    await this.checkProvinceExistById(id);
 
     await prisma.province.delete({
       where: { id },

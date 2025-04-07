@@ -32,6 +32,27 @@ export class CountryService {
       throw new ErrorResponse(400, "Failed create country", errorMessage);
   }
 
+  static async checkCountryExistById(
+    id: number
+  ): Promise<{ countryName: string; countryCode: string }> {
+    const existingCountry = await prisma.country.findUnique({
+      where: { id },
+    });
+
+    if (!existingCountry) {
+      throw new ErrorResponse(
+        404,
+        "Country not found",
+        "Country with this ID doesn't exist!"
+      );
+    }
+
+    return {
+      countryName: existingCountry.country_code,
+      countryCode: existingCountry.country_code,
+    };
+  }
+
   static async create(
     request: CountryRequest,
     userId: number
@@ -66,21 +87,11 @@ export class CountryService {
   ): Promise<CountryResponse> {
     const updateRequest = validation(CountryValidation.create, request);
 
-    const existingCountry = await prisma.country.findUnique({
-      where: { id },
-    });
-
-    if (!existingCountry) {
-      throw new ErrorResponse(
-        404,
-        "Country not found",
-        "Country with this ID doesn't exist!"
-      );
-    }
+    const { countryName, countryCode } = await this.checkCountryExistById(id);
 
     if (
-      updateRequest.countryName !== existingCountry.country_name &&
-      updateRequest.countryCode !== existingCountry.country_code
+      updateRequest.countryName !== countryName &&
+      updateRequest.countryCode !== countryCode
     ) {
       await this.checkCountryExist(
         updateRequest.countryName,
@@ -111,17 +122,7 @@ export class CountryService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingCountry = await prisma.country.findUnique({
-      where: { id },
-    });
-
-    if (!existingCountry) {
-      throw new ErrorResponse(
-        404,
-        "Country not found",
-        "Country with this ID doesn't exist!"
-      );
-    }
+    await this.checkCountryExistById(id);
 
     const updatedActive = await prisma.country.update({
       where: { id },
@@ -197,17 +198,7 @@ export class CountryService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingCountry = await prisma.country.findUnique({
-      where: { id },
-    });
-
-    if (!existingCountry) {
-      throw new ErrorResponse(
-        404,
-        "Country not found",
-        "Country with this ID doesn't exist!"
-      );
-    }
+    await this.checkCountryExistById(id);
 
     await prisma.country.delete({
       where: { id },
