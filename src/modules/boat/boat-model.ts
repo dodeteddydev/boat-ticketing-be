@@ -1,61 +1,59 @@
-import { Province } from "@prisma/client";
-import { CountryGlobalResponse } from "../country/country-model";
+import { Boat } from "@prisma/client";
+import { CategoryGlobalResponse } from "../category/category-model";
 import { UserGlobalResponse } from "../user/user-model";
 
-export type ProvinceGlobalResponse = {
+export type BoatGlobalResponse = {
   id: number;
   boatName: string;
   boatCode: string | null;
 };
 
-export type ProvinceResponse = {
+export type BoatResponse = {
   id: number;
   boatName: string;
   boatCode: string | null;
-  country: CountryGlobalResponse;
+  category: CategoryGlobalResponse;
   createdBy: UserGlobalResponse | null;
   createdAt: string;
   updatedAt: string;
   active: boolean;
 };
 
-export type ProvinceRequest = {
+export type BoatRequest = {
   boatName: string;
   boatCode: string;
-  countryId: number;
+  categoryId: number;
 };
 
-export type FilterProvinceRequest = {
+export type FilterBoatRequest = {
   search?: string;
-  countryId?: number;
+  categoryId?: number;
   page: number;
   size: number;
   all?: boolean;
 };
 
-export const convertProvinceResponse = (
-  province: Province,
+export const convertBoatResponse = (
+  boat: Boat,
   createdBy: UserGlobalResponse,
-  country: CountryGlobalResponse
-): ProvinceResponse => {
+  category: CategoryGlobalResponse
+): BoatResponse => {
   return {
-    id: province.id,
-    boatName: province.province_name,
-    boatCode: province.province_code,
-    country: country,
+    id: boat.id,
+    boatName: boat.boat_name,
+    boatCode: boat.boat_code,
+    category: category,
     createdBy: createdBy,
-    createdAt: province.created_at.toISOString(),
-    updatedAt: province.updated_at.toISOString(),
-    active: province.active,
+    createdAt: boat.created_at.toISOString(),
+    updatedAt: boat.updated_at.toISOString(),
+    active: boat.active,
   };
 };
 
-export const convertProvinceGlobalResponse = (
-  province: Province
-): ProvinceGlobalResponse => {
+export const convertBoatGlobalResponse = (boat: Boat): BoatGlobalResponse => {
   return {
-    id: province.id,
-    boatName: province.province_name,
-    boatCode: province.province_code,
+    id: boat.id,
+    boatName: boat.boat_name,
+    boatCode: boat.boat_code,
   };
 };

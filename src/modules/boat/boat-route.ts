@@ -1,38 +1,38 @@
 import express from "express";
 import { authMiddleware } from "../../middlewares/authMiddleware";
-import { ProvinceController } from "./boat-controller";
+import { BoatController } from "./boat-controller";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
 import { Role } from "@prisma/client";
 
-export const provinceRoute = express.Router();
+export const boatRoute = express.Router();
 
-provinceRoute.post(
-  "/api/province",
+boatRoute.post(
+  "/api/boat",
   authMiddleware,
-  featureAccessMiddleware([Role.superadmin]),
-  ProvinceController.create
+  featureAccessMiddleware([Role.superadmin, Role.boatowner]),
+  BoatController.create
 );
-provinceRoute.put(
-  "/api/province/:id",
+boatRoute.put(
+  "/api/boat/:id",
   authMiddleware,
-  featureAccessMiddleware([Role.superadmin]),
-  ProvinceController.update
+  featureAccessMiddleware([Role.superadmin, Role.boatowner]),
+  BoatController.update
 );
-provinceRoute.patch(
-  "/api/province/:id/active",
+boatRoute.patch(
+  "/api/boat/:id/active",
   authMiddleware,
-  featureAccessMiddleware([Role.superadmin]),
-  ProvinceController.active
+  featureAccessMiddleware([Role.superadmin, Role.boatowner]),
+  BoatController.active
 );
-provinceRoute.get(
-  "/api/province",
+boatRoute.get(
+  "/api/boat",
   authMiddleware,
   featureAccessMiddleware(),
-  ProvinceController.get
+  BoatController.get
 );
-provinceRoute.delete(
-  "/api/province/:id",
+boatRoute.delete(
+  "/api/boat/:id",
   authMiddleware,
-  featureAccessMiddleware([Role.superadmin]),
-  ProvinceController.delete
+  featureAccessMiddleware([Role.superadmin, Role.boatowner]),
+  BoatController.delete
 );

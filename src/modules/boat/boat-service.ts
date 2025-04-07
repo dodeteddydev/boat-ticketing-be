@@ -4,130 +4,120 @@ import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
 import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
-import { convertCountryGlobalResponse } from "../country/country-model";
+import { convertCategoryGlobalResponse } from "../category/category-model";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
-  convertProvinceResponse,
-  FilterProvinceRequest,
-  ProvinceRequest,
-  ProvinceResponse,
+  BoatRequest,
+  BoatResponse,
+  convertBoatResponse,
+  FilterBoatRequest,
 } from "./boat-model";
-import { ProvinceValidation } from "./boat-validation";
+import { BoatValidation } from "./boat-validation";
 
-export class ProvinceService {
-  static async checkCountryExist(countryId: number) {
-    const country = await prisma.country.findFirst({
+export class BoatService {
+  static async checkCategoryExist(categoryId: number) {
+    const category = await prisma.category.findFirst({
       where: {
-        id: countryId,
+        id: categoryId,
       },
     });
 
-    if (!country)
+    if (!category)
       throw new ErrorResponse(
         404,
-        "Failed create province",
-        "Country doesn't exist"
+        "Failed create boat",
+        "Category doesn't exist"
       );
   }
 
-  static async checkProvinceExist(provinceName: string, provinceCode: string) {
-    const province = await prisma.province.findFirst({
+  static async checkBoatExist(boatName: string, boatCode: string) {
+    const boat = await prisma.boat.findFirst({
       where: {
-        OR: [{ province_name: provinceName }, { province_code: provinceCode }],
+        OR: [{ boat_name: boatName }, { boat_code: boatCode }],
       },
     });
 
     const errorMessage =
-      province?.province_name === provinceName
-        ? "Province name is already exist"
-        : province?.province_code === provinceCode
-        ? "Province code already exist"
-        : "Province is already exist";
+      boat?.boat_name === boatName
+        ? "Boat name is already exist"
+        : boat?.boat_code === boatCode
+        ? "Boat code already exist"
+        : "Boat is already exist";
 
-    if (province)
-      throw new ErrorResponse(400, "Failed create province", errorMessage);
+    if (boat) throw new ErrorResponse(400, "Failed create boat", errorMessage);
   }
 
   static async create(
-    request: ProvinceRequest,
+    request: BoatRequest,
     userId: number
-  ): Promise<ProvinceResponse> {
-    const createRequest = validation(ProvinceValidation.create, request);
+  ): Promise<BoatResponse> {
+    const createRequest = validation(BoatValidation.create, request);
 
-    await this.checkCountryExist(createRequest.countryId);
+    await this.checkCategoryExist(createRequest.categoryId);
 
-    await this.checkProvinceExist(
-      createRequest.provinceName,
-      createRequest.provinceCode
-    );
+    await this.checkBoatExist(createRequest.boatName, createRequest.boatCode);
 
-    const createdProvince = await prisma.province.create({
+    const createdBoat = await prisma.boat.create({
       data: {
-        province_name: createRequest.provinceName,
-        province_code: createRequest.provinceCode,
-        country: { connect: { id: Number(createRequest.countryId) } },
+        boat_name: createRequest.boatName,
+        boat_code: createRequest.boatCode,
+        category: { connect: { id: Number(createRequest.categoryId) } },
         created_by: { connect: { id: Number(userId) } },
       },
       include: {
         created_by: true,
-        country: true,
+        category: true,
       },
     });
 
-    return convertProvinceResponse(
-      createdProvince,
-      convertUserGlobalResponse(createdProvince.created_by),
-      convertCountryGlobalResponse(createdProvince.country)
+    return convertBoatResponse(
+      createdBoat,
+      convertUserGlobalResponse(createdBoat.created_by),
+      convertCategoryGlobalResponse(createdBoat.category)
     );
   }
 
-  static async update(
-    request: ProvinceRequest,
-    id: number
-  ): Promise<ProvinceResponse> {
-    const updateRequest = validation(ProvinceValidation.create, request);
+  static async update(request: BoatRequest, id: number): Promise<BoatResponse> {
+    const updateRequest = validation(BoatValidation.create, request);
 
-    const existingProvince = await prisma.province.findUnique({
+    const existingBoat = await prisma.boat.findUnique({
       where: { id },
     });
 
-    if (!existingProvince) {
+    if (!existingBoat) {
       throw new ErrorResponse(
         404,
-        "Province not found",
-        "Province with this ID doesn't exist!"
+        "Boat not found",
+        "Boat with this ID doesn't exist!"
       );
     }
 
     if (
-      updateRequest.provinceName !== existingProvince.province_name &&
-      updateRequest.provinceCode !== existingProvince.province_code
+      updateRequest.boatName !== existingBoat.boat_name &&
+      updateRequest.boatCode !== existingBoat.boat_code
     ) {
-      await this.checkCountryExist(updateRequest.countryId);
+      await this.checkCategoryExist(updateRequest.categoryId);
 
-      await this.checkProvinceExist(
-        updateRequest.provinceName,
-        updateRequest.provinceCode
-      );
+      await this.checkBoatExist(updateRequest.boatName, updateRequest.boatCode);
     }
 
-    const updatedProvince = await prisma.province.update({
+    const updatedBoat = await prisma.boat.update({
       where: { id },
       data: {
-        province_name: updateRequest.provinceName,
-        province_code: updateRequest.provinceCode,
-        country: { connect: { id: Number(updateRequest.countryId) } },
+        boat_name: updateRequest.boatName,
+        boat_code: updateRequest.boatCode,
+        category: { connect: { id: Number(updateRequest.categoryId) } },
       },
       include: {
         created_by: true,
-        country: true,
+        category: true,
       },
     });
 
-    return convertProvinceResponse(
-      updatedProvince,
-      convertUserGlobalResponse(updatedProvince.created_by),
-      convertCountryGlobalResponse(updatedProvince.country)
+    return convertBoatResponse(
+      updatedBoat,
+      convertUserGlobalResponse(updatedBoat.created_by),
+      convertCategoryGlobalResponse(updatedBoat.category)
     );
   }
 
@@ -137,19 +127,19 @@ export class ProvinceService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingProvince = await prisma.province.findUnique({
+    const existingBoat = await prisma.boat.findUnique({
       where: { id },
     });
 
-    if (!existingProvince) {
+    if (!existingBoat) {
       throw new ErrorResponse(
         404,
-        "Province not found",
-        "Province with this ID doesn't exist!"
+        "Boat not found",
+        "Boat with this ID doesn't exist!"
       );
     }
 
-    const updatedActive = await prisma.province.update({
+    const updatedActive = await prisma.boat.update({
       where: { id },
       data: {
         active: activeRequest.active,
@@ -160,16 +150,16 @@ export class ProvinceService {
   }
 
   static async get(
-    request: FilterProvinceRequest
-  ): Promise<Pageable<ProvinceResponse>> {
-    const getRequest = validation(ProvinceValidation.get, request);
+    request: FilterBoatRequest
+  ): Promise<Pageable<BoatResponse>> {
+    const getRequest = validation(BoatValidation.get, request);
     const skip = (getRequest.page - 1) * getRequest.size;
 
     const filters = [];
 
-    if (getRequest.countryId) {
+    if (getRequest.categoryId) {
       filters.push({
-        country_id: Number(getRequest.countryId),
+        category_id: Number(getRequest.categoryId),
       });
     }
 
@@ -177,12 +167,12 @@ export class ProvinceService {
       filters.push({
         OR: [
           {
-            province_name: {
+            boat_name: {
               contains: getRequest.search,
             },
           },
           {
-            province_code: {
+            boat_code: {
               contains: getRequest.search,
             },
           },
@@ -190,7 +180,7 @@ export class ProvinceService {
       });
     }
 
-    const getProvince = await prisma.province.findMany({
+    const getBoat = await prisma.boat.findMany({
       where: {
         AND: filters,
       },
@@ -201,22 +191,22 @@ export class ProvinceService {
       skip: getRequest.all ? undefined : skip,
       include: {
         created_by: true,
-        country: true,
+        category: true,
       },
     });
 
-    const total = await prisma.province.count({
+    const total = await prisma.boat.count({
       where: {
         AND: filters,
       },
     });
 
     return {
-      data: getProvince.map((value) =>
-        convertProvinceResponse(
+      data: getBoat.map((value) =>
+        convertBoatResponse(
           value,
           convertUserGlobalResponse(value.created_by),
-          convertCountryGlobalResponse(value.country)
+          convertCategoryGlobalResponse(value.category)
         )
       ),
       paging: getRequest.all
@@ -230,25 +220,25 @@ export class ProvinceService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingProvince = await prisma.province.findUnique({
+    const existingBoat = await prisma.boat.findUnique({
       where: { id },
     });
 
-    if (!existingProvince) {
+    if (!existingBoat) {
       throw new ErrorResponse(
         404,
-        "Province not found",
-        "Province with this ID doesn't exist!"
+        "Boat not found",
+        "Boat with this ID doesn't exist!"
       );
     }
 
-    await prisma.province.delete({
+    await prisma.boat.delete({
       where: { id },
       include: {
         created_by: true,
       },
     });
 
-    return `Province with ID ${id} is deleted`;
+    return `Boat with ID ${id} is deleted`;
   }
 }

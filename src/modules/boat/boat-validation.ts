@@ -1,14 +1,14 @@
 import { z, ZodType } from "zod";
 
-export class ProvinceValidation {
+export class BoatValidation {
   static create: ZodType = z.object({
-    provinceName: z
-      .string({ required_error: "Province name is required" })
-      .min(1, "Province name must be at least 1 character"),
-    provinceCode: z
-      .string({ required_error: "Province code is required" })
-      .min(1, "Province code must be at least 1 character"),
-    countryId: z.number({ required_error: "Country is required" }).min(1),
+    boatName: z
+      .string({ required_error: "Boat name is required" })
+      .min(1, "Boat name must be at least 1 character"),
+    boatCode: z
+      .string({ required_error: "Boat code is required" })
+      .min(1, "Boat code must be at least 1 character"),
+    categoryId: z.number({ required_error: "Country is required" }).min(1),
   });
 
   static update: ZodType = this.create;
@@ -16,7 +16,7 @@ export class ProvinceValidation {
   static get: ZodType = z
     .object({
       search: z.string().min(1).optional(),
-      countryId: z.number().min(1).optional(),
+      categoryId: z.number().min(1).optional(),
       page: z.number().min(1).positive(),
       size: z.number().min(1).max(100).positive(),
       all: z.boolean().optional(),
