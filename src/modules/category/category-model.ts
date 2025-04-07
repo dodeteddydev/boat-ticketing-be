@@ -1,6 +1,12 @@
 import { Category } from "@prisma/client";
 import { UserGlobalResponse } from "../user/user-model";
 
+export type CategoryGlobalResponse = {
+  id: number;
+  categoryName: string;
+  categoryCode: string;
+};
+
 export type CategoryResponse = {
   id: number;
   categoryName: string;
@@ -35,5 +41,15 @@ export const convertCategoryResponse = (
     createdAt: category.created_at.toISOString(),
     updatedAt: category.updated_at.toISOString(),
     active: category.active,
+  };
+};
+
+export const convertCategoryGlobalResponse = (
+  category: Category
+): CategoryGlobalResponse => {
+  return {
+    id: category.id,
+    categoryName: category.category_name,
+    categoryCode: category.category_code,
   };
 };
