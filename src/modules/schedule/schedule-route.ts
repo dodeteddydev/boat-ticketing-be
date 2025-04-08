@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
-import { ScheduleController } from "./schedule-controller";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { ScheduleController } from "./schedule-controller";
 
 export const scheduleRoute = express.Router();
 

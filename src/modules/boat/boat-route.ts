@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
 import { authMiddleware } from "../../middlewares/authMiddleware";
-import { BoatController } from "./boat-controller";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { BoatController } from "./boat-controller";
 
 export const boatRoute = express.Router();
 

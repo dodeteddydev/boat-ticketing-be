@@ -6,14 +6,8 @@ import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
 import { convertBoatGlobalResponse } from "../boat/boat-model";
 import { BoatService } from "../boat/boat-service";
-import { convertCityGlobalResponse } from "../city/city-model";
-import { CityService } from "../city/city-service";
-import { convertCountryGlobalResponse } from "../country/country-model";
-import { CountryService } from "../country/country-service";
 import { convertPortGlobalResponse } from "../port/port-model";
 import { PortService } from "../port/port-service";
-import { convertProvinceGlobalResponse } from "../province/province-model";
-import { ProvinceService } from "../province/province-service";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
   convertScheduleResponse,

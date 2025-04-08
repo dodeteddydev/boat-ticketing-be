@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../../middlewares/authMiddleware";
 import { ActiveRequest } from "../../types/activeRequest";
 import { ResponseHelpers } from "../../utilities/responseHelpers";
-import { ScheduleRequest, FilterScheduleRequest } from "./schedule-model";
+import { FilterScheduleRequest, ScheduleRequest } from "./schedule-model";
 import { ScheduleService } from "./schedule-service";
 
 export class ScheduleController {

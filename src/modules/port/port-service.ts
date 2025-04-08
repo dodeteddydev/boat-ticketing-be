@@ -13,9 +13,9 @@ import { ProvinceService } from "../province/province-service";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
   convertPortResponse,
+  FilterPortRequest,
   PortRequest,
   PortResponse,
-  FilterPortRequest,
 } from "./port-model";
 import { PortValidation } from "./port-validation";
 

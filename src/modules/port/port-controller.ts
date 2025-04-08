@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../../middlewares/authMiddleware";
 import { ActiveRequest } from "../../types/activeRequest";
 import { ResponseHelpers } from "../../utilities/responseHelpers";
-import { PortRequest, FilterPortRequest } from "./port-model";
+import { FilterPortRequest, PortRequest } from "./port-model";
 import { PortService } from "./port-service";
 
 export class PortController {

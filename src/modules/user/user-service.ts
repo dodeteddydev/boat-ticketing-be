@@ -6,6 +6,7 @@ import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
 import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
+import { WalletService } from "../wallet/wallet-service";
 import {
   convertUserGlobalResponse,
   convertUserResponse,
@@ -14,7 +15,6 @@ import {
   UserResponse,
 } from "./user-model";
 import { UserValidation } from "./user-validation";
-import { WalletService } from "../wallet/wallet-service";
 
 export class UserService {
   static async checkUserExist(name: string, username: string, email: string) {

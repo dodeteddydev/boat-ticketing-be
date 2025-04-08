@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
-import { CountryController } from "./country-controller";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { CountryController } from "./country-controller";
 
 export const countryRoute = express.Router();
 

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../../middlewares/authMiddleware";
 import { ActiveRequest } from "../../types/activeRequest";
 import { ResponseHelpers } from "../../utilities/responseHelpers";
-import { FilterBoatRequest, BoatRequest } from "./boat-model";
+import { BoatRequest, FilterBoatRequest } from "./boat-model";
 import { BoatService } from "./boat-service";
 
 export class BoatController {

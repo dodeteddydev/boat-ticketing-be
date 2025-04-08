@@ -6,6 +6,7 @@ import { ErrorResponse } from "../../utilities/errorResponse";
 import { JwtHelpers } from "../../utilities/jwtHelpers";
 import { validation } from "../../utilities/validation";
 import { convertUserResponse, UserResponse } from "../user/user-model";
+import { WalletService } from "../wallet/wallet-service";
 import {
   convertLoginResponse,
   convertRegisterResponse,
@@ -17,7 +18,6 @@ import {
   RegisterResponse,
 } from "./auth-model";
 import { AuthValidation } from "./auth-validation";
-import { WalletService } from "../wallet/wallet-service";
 
 export class AuthService {
   static async checkUserExist(name: string, username: string, email: string) {
