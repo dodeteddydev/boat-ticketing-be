@@ -5,6 +5,7 @@ import { ErrorResponse } from "../../utilities/errorResponse";
 import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
 import { convertCategoryGlobalResponse } from "../category/category-model";
+import { CategoryService } from "../category/category-service";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
   BoatRequest,
@@ -15,21 +16,6 @@ import {
 import { BoatValidation } from "./boat-validation";
 
 export class BoatService {
-  static async checkCategoryExist(categoryId: number) {
-    const category = await prisma.category.findFirst({
-      where: {
-        id: categoryId,
-      },
-    });
-
-    if (!category)
-      throw new ErrorResponse(
-        404,
-        "Failed create boat",
-        "Category doesn't exist"
-      );
-  }
-
   static async checkBoatExist(boatName: string, boatCode: string) {
     const boat = await prisma.boat.findFirst({
       where: {
@@ -47,13 +33,34 @@ export class BoatService {
     if (boat) throw new ErrorResponse(400, "Failed create boat", errorMessage);
   }
 
+  static async checkBoatExistById(
+    boatId: number
+  ): Promise<{ boatName: string; boatCode: string }> {
+    const existingBoat = await prisma.boat.findUnique({
+      where: { id: boatId },
+    });
+
+    if (!existingBoat) {
+      throw new ErrorResponse(
+        404,
+        "Boat not found",
+        "Boat with this ID doesn't exist!"
+      );
+    }
+
+    return {
+      boatName: existingBoat.boat_name,
+      boatCode: existingBoat.boat_code,
+    };
+  }
+
   static async create(
     request: BoatRequest,
     userId: number
   ): Promise<BoatResponse> {
     const createRequest = validation(BoatValidation.create, request);
 
-    await this.checkCategoryExist(createRequest.categoryId);
+    await CategoryService.checkCategoryExistById(createRequest.categoryId);
 
     await this.checkBoatExist(createRequest.boatName, createRequest.boatCode);
 
@@ -80,23 +87,13 @@ export class BoatService {
   static async update(request: BoatRequest, id: number): Promise<BoatResponse> {
     const updateRequest = validation(BoatValidation.create, request);
 
-    const existingBoat = await prisma.boat.findUnique({
-      where: { id },
-    });
-
-    if (!existingBoat) {
-      throw new ErrorResponse(
-        404,
-        "Boat not found",
-        "Boat with this ID doesn't exist!"
-      );
-    }
+    const existingBoat = await this.checkBoatExistById(id);
 
     if (
-      updateRequest.boatName !== existingBoat.boat_name &&
-      updateRequest.boatCode !== existingBoat.boat_code
+      updateRequest.boatName !== existingBoat.boatName &&
+      updateRequest.boatCode !== existingBoat.boatCode
     ) {
-      await this.checkCategoryExist(updateRequest.categoryId);
+      await CategoryService.checkCategoryExistById(updateRequest.categoryId);
 
       await this.checkBoatExist(updateRequest.boatName, updateRequest.boatCode);
     }
@@ -127,17 +124,7 @@ export class BoatService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingBoat = await prisma.boat.findUnique({
-      where: { id },
-    });
-
-    if (!existingBoat) {
-      throw new ErrorResponse(
-        404,
-        "Boat not found",
-        "Boat with this ID doesn't exist!"
-      );
-    }
+    const existingBoat = await this.checkBoatExistById(id);
 
     const updatedActive = await prisma.boat.update({
       where: { id },
@@ -220,17 +207,7 @@ export class BoatService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingBoat = await prisma.boat.findUnique({
-      where: { id },
-    });
-
-    if (!existingBoat) {
-      throw new ErrorResponse(
-        404,
-        "Boat not found",
-        "Boat with this ID doesn't exist!"
-      );
-    }
+    const existingBoat = await this.checkBoatExistById(id);
 
     await prisma.boat.delete({
       where: { id },
