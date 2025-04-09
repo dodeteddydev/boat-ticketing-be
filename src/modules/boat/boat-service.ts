@@ -93,6 +93,7 @@ export class BoatService {
       updateRequest.boatCode !== existingBoat.boatCode
     ) {
       await CategoryService.checkCategoryExistById(updateRequest.categoryId);
+
       await this.checkBoatExist(updateRequest.boatName, updateRequest.boatCode);
     }
 

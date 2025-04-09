@@ -122,7 +122,7 @@ export class CategoryService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingCategory = await this.checkCategoryExistById(id);
+    await this.checkCategoryExistById(id);
 
     const updatedActive = await prisma.category.update({
       where: { id },
@@ -198,7 +198,7 @@ export class CategoryService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingCategory = await this.checkCategoryExistById(id);
+    await this.checkCategoryExistById(id);
 
     await prisma.category.delete({
       where: { id },
