@@ -34,10 +34,10 @@ export class BoatService {
   }
 
   static async checkBoatExistById(
-    boatId: number
+    id: number
   ): Promise<{ boatName: string; boatCode: string }> {
     const existingBoat = await prisma.boat.findUnique({
-      where: { id: boatId },
+      where: { id },
     });
 
     if (!existingBoat) {
@@ -61,7 +61,6 @@ export class BoatService {
     const createRequest = validation(BoatValidation.create, request);
 
     await CategoryService.checkCategoryExistById(createRequest.categoryId);
-
     await this.checkBoatExist(createRequest.boatName, createRequest.boatCode);
 
     const createdBoat = await prisma.boat.create({
@@ -98,6 +97,8 @@ export class BoatService {
       await this.checkBoatExist(updateRequest.boatName, updateRequest.boatCode);
     }
 
+    await CategoryService.checkCategoryExistById(updateRequest.categoryId);
+
     const updatedBoat = await prisma.boat.update({
       where: { id },
       data: {
@@ -124,7 +125,7 @@ export class BoatService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingBoat = await this.checkBoatExistById(id);
+    await this.checkBoatExistById(id);
 
     const updatedActive = await prisma.boat.update({
       where: { id },
@@ -207,7 +208,7 @@ export class BoatService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingBoat = await this.checkBoatExistById(id);
+    await this.checkBoatExistById(id);
 
     await prisma.boat.delete({
       where: { id },

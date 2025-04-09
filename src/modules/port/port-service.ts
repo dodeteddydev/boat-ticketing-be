@@ -105,7 +105,14 @@ export class PortService {
       updateRequest.portCode !== portCode
     ) {
       await this.checkPortExist(updateRequest.portName, updateRequest.portCode);
+      await CountryService.checkCountryExistById(updateRequest.countryId);
+      await ProvinceService.checkProvinceExistById(updateRequest.provinceId);
+      await CityService.checkCityExistById(updateRequest.cityId);
     }
+
+    await CountryService.checkCountryExistById(updateRequest.countryId);
+    await ProvinceService.checkProvinceExistById(updateRequest.provinceId);
+    await CityService.checkCityExistById(updateRequest.cityId);
 
     const updatedPort = await prisma.port.update({
       where: { id },

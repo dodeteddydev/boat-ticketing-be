@@ -33,12 +33,10 @@ export class CategoryService {
   }
 
   static async checkCategoryExistById(
-    categoryId: number
-  ): Promise<{ categoryName: string; categoryCode: string }> {
-    const existingCategory = await prisma.category.findFirst({
-      where: {
-        id: categoryId,
-      },
+    id: number
+  ): Promise<{ countryName: string; countryCode: string }> {
+    const existingCategory = await prisma.category.findUnique({
+      where: { id },
     });
 
     if (!existingCategory) {
@@ -50,8 +48,8 @@ export class CategoryService {
     }
 
     return {
-      categoryName: existingCategory.category_name,
-      categoryCode: existingCategory.category_code,
+      countryName: existingCategory.category_name,
+      countryCode: existingCategory.category_code,
     };
   }
 
@@ -92,8 +90,8 @@ export class CategoryService {
     const existingCategory = await this.checkCategoryExistById(id);
 
     if (
-      updateRequest.categoryName !== existingCategory.categoryName &&
-      updateRequest.categoryCode !== existingCategory.categoryCode
+      updateRequest.categoryName !== existingCategory.countryName &&
+      updateRequest.categoryCode !== existingCategory.countryCode
     ) {
       await this.checkCategoryExist(
         updateRequest.categoryName,
@@ -124,7 +122,7 @@ export class CategoryService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingCategory = await this.checkCategoryExistById(id);
+    await this.checkCategoryExistById(id);
 
     const updatedActive = await prisma.category.update({
       where: { id },
@@ -200,7 +198,7 @@ export class CategoryService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingCategory = await this.checkCategoryExistById(id);
+    await this.checkCategoryExistById(id);
 
     await prisma.category.delete({
       where: { id },

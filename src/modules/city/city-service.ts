@@ -96,6 +96,9 @@ export class CityService {
       await this.checkCityExist(updateRequest.cityName);
     }
 
+    await CountryService.checkCountryExistById(updateRequest.countryId);
+    await ProvinceService.checkProvinceExistById(updateRequest.provinceId);
+
     const updatedCity = await prisma.city.update({
       where: { id },
       data: {
