@@ -11,6 +11,7 @@ import { provinceRoute } from "./modules/province/province-route";
 import { userRoute } from "./modules/user/user-route";
 import { boatRoute } from "./modules/boat/boat-route";
 import { portRoute } from "./modules/port/port-route";
+import { scheduleRoute } from "./modules/schedule/schedule-route";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -35,6 +36,7 @@ app.use(cityRoute);
 app.use(categoryRoute);
 app.use(boatRoute);
 app.use(portRoute);
+app.use(scheduleRoute);
 
 // MIDDLEWARE
 app.use(notFoundMiddleware);

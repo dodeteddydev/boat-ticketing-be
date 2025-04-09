@@ -9,6 +9,7 @@ export class ScheduleController {
   static async create(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const request = req.body as ScheduleRequest;
+
       const response = await ScheduleService.create(request, req.userId!);
       res
         .status(201)
@@ -20,7 +21,7 @@ export class ScheduleController {
     }
   }
 
-  static async update(req: Request, res: Response, next: NextFunction) {
+  static async update(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
       const request = req.body as ScheduleRequest;
@@ -38,7 +39,11 @@ export class ScheduleController {
         return;
       }
 
-      const response = await ScheduleService.update(request, scheduleId);
+      const response = await ScheduleService.update(
+        request,
+        scheduleId,
+        req.userId!
+      );
 
       res
         .status(200)

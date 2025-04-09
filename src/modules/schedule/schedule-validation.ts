@@ -2,10 +2,12 @@ import { z, ZodType } from "zod";
 
 export class ScheduleValidation {
   static create: ZodType = z.object({
-    schedule: z.date({ required_error: "Schedule is required" }),
+    schedule: z
+      .string({ required_error: "Schedule is required" })
+      .min(1, "Schedule is required"),
     seat: z.number({ required_error: "Seat is required" }).min(1),
     price: z.number({ required_error: "Price is required" }).min(1),
-    markUpPrice: z.number().min(1).optional(),
+    markupPrice: z.number().min(1).optional(),
     boatId: z.number({ required_error: "Boat is required" }).min(1),
     arrivalId: z.number({ required_error: "Arrival is required" }).min(1),
     departureId: z.number({ required_error: "Departure is required" }).min(1),

@@ -1,4 +1,5 @@
 import { prisma } from "../../config/database";
+import { logger } from "../../config/logger";
 import { ActiveRequest } from "../../types/activeRequest";
 import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
@@ -33,7 +34,7 @@ export class ScheduleService {
 
   static async checkScheduleExistById(
     portId: number
-  ): Promise<{ schedule: Date }> {
+  ): Promise<{ schedule: Date; boatId: number }> {
     const existingSchedule = await prisma.schedule.findUnique({
       where: { id: portId },
     });
@@ -48,7 +49,30 @@ export class ScheduleService {
 
     return {
       schedule: existingSchedule.schedule,
+      boatId: existingSchedule.boat_id,
     };
+  }
+
+  static checkPort(arrivalId: number, departureId: number) {
+    if (arrivalId === departureId) {
+      throw new ErrorResponse(
+        400,
+        "Failed create schedule",
+        "Arrival and departure ports must be different"
+      );
+    }
+  }
+
+  static async checkMarkup(userId: number, markupPrice?: number) {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+
+    if (user?.role !== "superadmin" && markupPrice) {
+      throw new ErrorResponse(
+        400,
+        "Failed create schedule",
+        "Only superadmin is allowed to set a markup price"
+      );
+    }
   }
 
   static async create(
@@ -57,13 +81,18 @@ export class ScheduleService {
   ): Promise<ScheduleResponse> {
     const createRequest = validation(ScheduleValidation.create, request);
 
+    await this.checkMarkup(Number(userId), createRequest.markupPrice);
     await this.checkScheduleExist(
       new Date(createRequest.schedule),
       createRequest.boatId
     );
     await BoatService.checkBoatExistById(createRequest.boatId);
-    await PortService.checkPortExistById(createRequest.arrivalId);
-    await PortService.checkPortExistById(createRequest.departureId);
+    await PortService.checkPortExistById(createRequest.arrivalId, "Arrival");
+    await PortService.checkPortExistById(
+      createRequest.departureId,
+      "Departure"
+    );
+    this.checkPort(createRequest.arrivalId, createRequest.departureId);
 
     const createdPort = await prisma.schedule.create({
       data: {
@@ -95,18 +124,45 @@ export class ScheduleService {
 
   static async update(
     request: ScheduleRequest,
-    id: number
+    id: number,
+    userId: number
   ): Promise<ScheduleResponse> {
     const updateRequest = validation(ScheduleValidation.create, request);
 
-    const { schedule } = await this.checkScheduleExistById(id);
+    const { schedule, boatId } = await this.checkScheduleExistById(id);
+    const isSameSchedule =
+      new Date(updateRequest.schedule).toISOString() !== schedule.toISOString();
 
-    if (new Date(updateRequest.schedule) !== schedule) {
+    if (isSameSchedule) {
+      await this.checkMarkup(Number(userId), updateRequest.markupPrice);
+      await this.checkScheduleExist(
+        new Date(updateRequest.schedule),
+        updateRequest.boatId
+      );
+      await BoatService.checkBoatExistById(updateRequest.boatId);
+      await PortService.checkPortExistById(updateRequest.arrivalId, "Arrival");
+      await PortService.checkPortExistById(
+        updateRequest.departureId,
+        "Departure"
+      );
+      this.checkPort(updateRequest.arrivalId, updateRequest.departureId);
+    }
+
+    if (updateRequest.boatId !== boatId) {
       await this.checkScheduleExist(
         new Date(updateRequest.schedule),
         updateRequest.boatId
       );
     }
+
+    await this.checkMarkup(Number(userId), updateRequest.markupPrice);
+    await BoatService.checkBoatExistById(updateRequest.boatId);
+    await PortService.checkPortExistById(updateRequest.arrivalId, "Arrival");
+    await PortService.checkPortExistById(
+      updateRequest.departureId,
+      "Departure"
+    );
+    this.checkPort(updateRequest.arrivalId, updateRequest.departureId);
 
     const updatedPort = await prisma.schedule.update({
       where: { id },
