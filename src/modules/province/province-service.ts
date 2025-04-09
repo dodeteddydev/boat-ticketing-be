@@ -110,6 +110,8 @@ export class ProvinceService {
       );
     }
 
+    await CountryService.checkCountryExistById(updateRequest.countryId);
+
     const updatedProvince = await prisma.province.update({
       where: { id },
       data: {
