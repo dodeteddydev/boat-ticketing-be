@@ -32,6 +32,27 @@ export class CategoryService {
       throw new ErrorResponse(400, "Failed create category", errorMessage);
   }
 
+  static async checkCategoryExistById(
+    id: number
+  ): Promise<{ countryName: string; countryCode: string }> {
+    const existingCategory = await prisma.category.findUnique({
+      where: { id },
+    });
+
+    if (!existingCategory) {
+      throw new ErrorResponse(
+        404,
+        "Category not found",
+        "Category with this ID doesn't exist!"
+      );
+    }
+
+    return {
+      countryName: existingCategory.category_name,
+      countryCode: existingCategory.category_code,
+    };
+  }
+
   static async create(
     request: CategoryRequest,
     userId: number
@@ -66,21 +87,11 @@ export class CategoryService {
   ): Promise<CategoryResponse> {
     const updateRequest = validation(CategoryValidation.create, request);
 
-    const existingCategory = await prisma.category.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      throw new ErrorResponse(
-        404,
-        "Category not found",
-        "Category with this ID doesn't exist!"
-      );
-    }
+    const existingCategory = await this.checkCategoryExistById(id);
 
     if (
-      updateRequest.categoryName !== existingCategory.category_name &&
-      updateRequest.categoryCode !== existingCategory.category_code
+      updateRequest.categoryName !== existingCategory.countryName &&
+      updateRequest.categoryCode !== existingCategory.countryCode
     ) {
       await this.checkCategoryExist(
         updateRequest.categoryName,
@@ -111,17 +122,7 @@ export class CategoryService {
   ): Promise<{ active: boolean }> {
     const activeRequest = validation(activeValidation, request);
 
-    const existingCategory = await prisma.category.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      throw new ErrorResponse(
-        404,
-        "Category not found",
-        "Category with this ID doesn't exist!"
-      );
-    }
+    const existingCategory = await this.checkCategoryExistById(id);
 
     const updatedActive = await prisma.category.update({
       where: { id },
@@ -197,17 +198,7 @@ export class CategoryService {
   }
 
   static async delete(id: number): Promise<string> {
-    const existingCategory = await prisma.category.findUnique({
-      where: { id },
-    });
-
-    if (!existingCategory) {
-      throw new ErrorResponse(
-        404,
-        "Category not found",
-        "Category with this ID doesn't exist!"
-      );
-    }
+    const existingCategory = await this.checkCategoryExistById(id);
 
     await prisma.category.delete({
       where: { id },
