@@ -6,9 +6,9 @@ import { validation } from "../../utilities/validation";
 import { activeValidation } from "../../validation/activeValidation";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
-  convertCategoryResponse,
   CategoryRequest,
   CategoryResponse,
+  convertCategoryResponse,
   FilterCategoryRequest,
 } from "./category-model";
 import { CategoryValidation } from "./category-validation";

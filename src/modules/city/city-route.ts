@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
 import { authMiddleware } from "../../middlewares/authMiddleware";
-import { CityController } from "./city-controller";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { CityController } from "./city-controller";
 
 export const cityRoute = express.Router();
 

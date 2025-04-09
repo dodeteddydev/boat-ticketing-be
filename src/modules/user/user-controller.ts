@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from "express";
+import { AuthRequest } from "../../middlewares/authMiddleware";
+import { ActiveRequest } from "../../types/activeRequest";
 import { ResponseHelpers } from "../../utilities/responseHelpers";
 import { FilterUserRequest, UserRequest } from "./user-model";
 import { UserService } from "./user-service";
-import { AuthRequest } from "../../middlewares/authMiddleware";
-import { ActiveRequest } from "../../types/activeRequest";
 
 export class UserController {
   static async create(req: AuthRequest, res: Response, next: NextFunction) {

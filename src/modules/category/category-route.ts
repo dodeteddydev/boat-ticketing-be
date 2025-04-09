@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
-import { CategoryController } from "./category-controller";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { CategoryController } from "./category-controller";
 
 export const categoryRoute = express.Router();
 

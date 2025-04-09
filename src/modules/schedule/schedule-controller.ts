@@ -2,45 +2,54 @@ import { NextFunction, Request, Response } from "express";
 import { AuthRequest } from "../../middlewares/authMiddleware";
 import { ActiveRequest } from "../../types/activeRequest";
 import { ResponseHelpers } from "../../utilities/responseHelpers";
-import { BoatRequest, FilterBoatRequest } from "./boat-model";
-import { BoatService } from "./boat-service";
+import { FilterScheduleRequest, ScheduleRequest } from "./schedule-model";
+import { ScheduleService } from "./schedule-service";
 
-export class BoatController {
+export class ScheduleController {
   static async create(req: AuthRequest, res: Response, next: NextFunction) {
     try {
-      const request = req.body as BoatRequest;
-      const response = await BoatService.create(request, req.userId!);
+      const request = req.body as ScheduleRequest;
+
+      const response = await ScheduleService.create(request, req.userId!);
       res
         .status(201)
-        .json(ResponseHelpers.success("Boat created successfully", response));
+        .json(
+          ResponseHelpers.success("Schedule created successfully", response)
+        );
     } catch (error) {
       next(error);
     }
   }
 
-  static async update(req: Request, res: Response, next: NextFunction) {
+  static async update(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      const request = req.body as BoatRequest;
+      const request = req.body as ScheduleRequest;
 
-      const boatId = Number(id);
-      if (isNaN(boatId)) {
+      const scheduleId = Number(id);
+      if (isNaN(scheduleId)) {
         res
           .status(400)
           .json(
             ResponseHelpers.error(
-              "Invalid Boat ID",
+              "Invalid Schedule ID",
               "ID must be type of number"
             )
           );
         return;
       }
 
-      const response = await BoatService.update(request, boatId);
+      const response = await ScheduleService.update(
+        request,
+        scheduleId,
+        req.userId!
+      );
 
       res
         .status(200)
-        .json(ResponseHelpers.success("Boat updated successfully", response));
+        .json(
+          ResponseHelpers.success("Schedule updated successfully", response)
+        );
     } catch (error) {
       next(error);
     }
@@ -51,20 +60,20 @@ export class BoatController {
       const { id } = req.params;
       const request = req.body as ActiveRequest;
 
-      const boatId = Number(id);
-      if (isNaN(boatId)) {
+      const scheduleId = Number(id);
+      if (isNaN(scheduleId)) {
         res
           .status(400)
           .json(
             ResponseHelpers.error(
-              "Invalid Boat ID",
+              "Invalid Schedule ID",
               "ID must be type of number"
             )
           );
         return;
       }
 
-      const response = await BoatService.active(request, boatId);
+      const response = await ScheduleService.active(request, scheduleId);
 
       res
         .status(200)
@@ -77,20 +86,21 @@ export class BoatController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
       const request = {
-        search: req.query.search as string,
         countryId: req.query.countryId && Number(req.query.countryId),
+        provinceId: req.query.provinceId && Number(req.query.provinceId),
+        cityId: req.query.cityId && Number(req.query.cityId),
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
         all: req.query.all === "true",
-      } as FilterBoatRequest;
+      } as FilterScheduleRequest;
 
-      const response = await BoatService.get(request);
+      const response = await ScheduleService.get(request);
 
       res
         .status(200)
         .json(
           ResponseHelpers.successWithPagination(
-            "Boat get successfully",
+            "Schedule get successfully",
             response
           )
         );
@@ -103,24 +113,26 @@ export class BoatController {
     try {
       const { id } = req.params;
 
-      const boatId = Number(id);
-      if (isNaN(boatId)) {
+      const scheduleId = Number(id);
+      if (isNaN(scheduleId)) {
         res
           .status(400)
           .json(
             ResponseHelpers.error(
-              "Invalid Boat ID",
+              "Invalid Schedule ID",
               "ID must be type of number"
             )
           );
         return;
       }
 
-      const response = await BoatService.delete(boatId);
+      const response = await ScheduleService.delete(scheduleId);
 
       res
         .status(200)
-        .json(ResponseHelpers.success("Boat deleted successfully", response));
+        .json(
+          ResponseHelpers.success("Schedule deleted successfully", response)
+        );
     } catch (error) {
       next(error);
     }

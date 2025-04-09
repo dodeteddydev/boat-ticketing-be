@@ -192,7 +192,7 @@ model Schedule {
   schedule DateTime
   seat Int
   price Float
-  markup_price Float
+  markup_price Float?
   boat_id Int
   boat Boat @relation(fields: [boat_id], references: [id], onDelete: Cascade)
   arrival_id Int

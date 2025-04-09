@@ -92,3 +92,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+// HOW TO RUN npx prisma db seed

@@ -1,5 +1,4 @@
 import { Role, User } from "@prisma/client";
-import { Request } from "express";
 
 export type RegisterResponse = {
   id: number;

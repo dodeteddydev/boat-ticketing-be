@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
-import { PortController } from "./port-controller";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { PortController } from "./port-controller";
 
 export const portRoute = express.Router();
 

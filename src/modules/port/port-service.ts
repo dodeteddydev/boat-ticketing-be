@@ -13,9 +13,9 @@ import { ProvinceService } from "../province/province-service";
 import { convertUserGlobalResponse } from "../user/user-model";
 import {
   convertPortResponse,
+  FilterPortRequest,
   PortRequest,
   PortResponse,
-  FilterPortRequest,
 } from "./port-model";
 import { PortValidation } from "./port-validation";
 
@@ -38,7 +38,8 @@ export class PortService {
   }
 
   static async checkPortExistById(
-    portId: number
+    portId: number,
+    message?: string
   ): Promise<{ portName: string; portCode: string }> {
     const existingPort = await prisma.port.findUnique({
       where: { id: portId },
@@ -47,8 +48,8 @@ export class PortService {
     if (!existingPort) {
       throw new ErrorResponse(
         404,
-        "Port not found",
-        "Port with this ID doesn't exist!"
+        `${message ? message : "Port"} not found`,
+        `${message ? message : "Port"} with this ID doesn't exist!`
       );
     }
 

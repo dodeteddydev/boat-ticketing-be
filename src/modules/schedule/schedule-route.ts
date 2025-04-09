@@ -2,37 +2,37 @@ import { Role } from "@prisma/client";
 import express from "express";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { BoatController } from "./boat-controller";
+import { ScheduleController } from "./schedule-controller";
 
-export const boatRoute = express.Router();
+export const scheduleRoute = express.Router();
 
-boatRoute.post(
-  "/api/boat",
+scheduleRoute.post(
+  "/api/schedule",
   authMiddleware,
   featureAccessMiddleware([Role.superadmin, Role.boatowner]),
-  BoatController.create
+  ScheduleController.create
 );
-boatRoute.put(
-  "/api/boat/:id",
+scheduleRoute.put(
+  "/api/schedule/:id",
   authMiddleware,
   featureAccessMiddleware([Role.superadmin, Role.boatowner]),
-  BoatController.update
+  ScheduleController.update
 );
-boatRoute.patch(
-  "/api/boat/:id/active",
+scheduleRoute.patch(
+  "/api/schedule/:id/active",
   authMiddleware,
   featureAccessMiddleware([Role.superadmin, Role.boatowner]),
-  BoatController.active
+  ScheduleController.active
 );
-boatRoute.get(
-  "/api/boat",
+scheduleRoute.get(
+  "/api/schedule",
   authMiddleware,
   featureAccessMiddleware(),
-  BoatController.get
+  ScheduleController.get
 );
-boatRoute.delete(
-  "/api/boat/:id",
+scheduleRoute.delete(
+  "/api/schedule/:id",
   authMiddleware,
   featureAccessMiddleware([Role.superadmin, Role.boatowner]),
-  BoatController.delete
+  ScheduleController.delete
 );

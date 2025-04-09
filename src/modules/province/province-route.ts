@@ -1,8 +1,8 @@
+import { Role } from "@prisma/client";
 import express from "express";
 import { authMiddleware } from "../../middlewares/authMiddleware";
-import { ProvinceController } from "./province-controller";
 import { featureAccessMiddleware } from "../../middlewares/featureAccessMiddleware";
-import { Role } from "@prisma/client";
+import { ProvinceController } from "./province-controller";
 
 export const provinceRoute = express.Router();
 

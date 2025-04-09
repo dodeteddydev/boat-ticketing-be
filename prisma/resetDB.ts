@@ -25,3 +25,5 @@ async function resetDatabase() {
 resetDatabase()
   .catch((e) => console.error("❌ Error resetting database:", e))
   .finally(async () => await prisma.$disconnect());
+
+// HOW TO RUN npx ts-node prisma/resetDB.ts
