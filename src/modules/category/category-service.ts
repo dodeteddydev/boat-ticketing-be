@@ -34,7 +34,7 @@ export class CategoryService {
 
   static async checkCategoryExistById(
     id: number
-  ): Promise<{ countryName: string; countryCode: string }> {
+  ): Promise<{ categoryName: string; categoryCode: string }> {
     const existingCategory = await prisma.category.findUnique({
       where: { id },
     });
@@ -48,8 +48,8 @@ export class CategoryService {
     }
 
     return {
-      countryName: existingCategory.category_name,
-      countryCode: existingCategory.category_code,
+      categoryName: existingCategory.category_name,
+      categoryCode: existingCategory.category_code,
     };
   }
 
@@ -90,8 +90,8 @@ export class CategoryService {
     const existingCategory = await this.checkCategoryExistById(id);
 
     if (
-      updateRequest.categoryName !== existingCategory.countryName &&
-      updateRequest.categoryCode !== existingCategory.countryCode
+      updateRequest.categoryName !== existingCategory.categoryName &&
+      updateRequest.categoryCode !== existingCategory.categoryCode
     ) {
       await this.checkCategoryExist(
         updateRequest.categoryName,
