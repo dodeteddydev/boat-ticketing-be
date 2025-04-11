@@ -18,6 +18,7 @@ export class ScheduleValidation {
   static get: ZodType = z
     .object({
       schedule: z.string().min(1).optional(),
+      boatId: z.number().min(1).optional(),
       arrivalId: z.number().min(1).optional(),
       departureId: z.number().min(1).optional(),
       page: z.number().min(1).positive().optional(),

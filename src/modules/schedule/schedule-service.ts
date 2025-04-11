@@ -1,5 +1,4 @@
 import { prisma } from "../../config/database";
-import { logger } from "../../config/logger";
 import { ActiveRequest } from "../../types/activeRequest";
 import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
@@ -19,7 +18,11 @@ import {
 import { ScheduleValidation } from "./schedule-validation";
 
 export class ScheduleService {
-  static async checkScheduleExist(date: Date, boatId: number) {
+  static async checkScheduleExist(
+    type: "create" | "update",
+    date: Date,
+    boatId: number
+  ) {
     const schedule = await prisma.schedule.findFirst({
       where: {
         AND: [{ schedule: date }, { boat_id: boatId }],
@@ -29,7 +32,7 @@ export class ScheduleService {
     const errorMessage = "Schedule is already exist";
 
     if (schedule)
-      throw new ErrorResponse(400, "Failed create schedule", errorMessage);
+      throw new ErrorResponse(400, `Failed ${type} schedule`, errorMessage);
   }
 
   static async checkScheduleExistById(
@@ -53,24 +56,47 @@ export class ScheduleService {
     };
   }
 
-  static checkPort(arrivalId: number, departureId: number) {
+  static checkPort(
+    type: "create" | "update",
+    arrivalId: number,
+    departureId: number
+  ) {
     if (arrivalId === departureId) {
       throw new ErrorResponse(
         400,
-        "Failed create schedule",
+        `Failed ${type} schedule`,
         "Arrival and departure ports must be different"
       );
     }
   }
 
-  static async checkMarkup(userId: number, markupPrice?: number) {
+  static async checkMarkup(
+    type: "create" | "update",
+    userId: number,
+    markupPrice?: number
+  ) {
     const user = await prisma.user.findUnique({ where: { id: userId } });
 
     if (user?.role !== "superadmin" && markupPrice) {
       throw new ErrorResponse(
         400,
-        "Failed create schedule",
+        `Failed ${type} schedule`,
         "Only superadmin is allowed to set a markup price"
+      );
+    }
+  }
+
+  static async checkScheduleFormat(
+    type: "create" | "update",
+    schedule: string
+  ) {
+    const scheduleDate = new Date(schedule);
+
+    if (isNaN(scheduleDate.getTime())) {
+      throw new ErrorResponse(
+        400,
+        `Failed ${type} schedule`,
+        "Invalid schedule date format"
       );
     }
   }
@@ -81,8 +107,10 @@ export class ScheduleService {
   ): Promise<ScheduleResponse> {
     const createRequest = validation(ScheduleValidation.create, request);
 
-    await this.checkMarkup(Number(userId), createRequest.markupPrice);
+    await this.checkScheduleFormat("create", createRequest.schedule);
+    await this.checkMarkup("create", Number(userId), createRequest.markupPrice);
     await this.checkScheduleExist(
+      "create",
       new Date(createRequest.schedule),
       createRequest.boatId
     );
@@ -92,11 +120,15 @@ export class ScheduleService {
       createRequest.departureId,
       "Departure"
     );
-    this.checkPort(createRequest.arrivalId, createRequest.departureId);
+    this.checkPort(
+      "create",
+      createRequest.arrivalId,
+      createRequest.departureId
+    );
 
     const createdPort = await prisma.schedule.create({
       data: {
-        schedule: createRequest.schedule,
+        schedule: new Date(createRequest.schedule),
         seat: createRequest.seat,
         price: createRequest.price,
         markup_price: createRequest.markupPrice,
@@ -134,8 +166,14 @@ export class ScheduleService {
       new Date(updateRequest.schedule).toISOString() !== schedule.toISOString();
 
     if (isSameSchedule) {
-      await this.checkMarkup(Number(userId), updateRequest.markupPrice);
+      await this.checkScheduleFormat("update", updateRequest.schedule);
+      await this.checkMarkup(
+        "update",
+        Number(userId),
+        updateRequest.markupPrice
+      );
       await this.checkScheduleExist(
+        "update",
         new Date(updateRequest.schedule),
         updateRequest.boatId
       );
@@ -145,29 +183,39 @@ export class ScheduleService {
         updateRequest.departureId,
         "Departure"
       );
-      this.checkPort(updateRequest.arrivalId, updateRequest.departureId);
+      this.checkPort(
+        "update",
+        updateRequest.arrivalId,
+        updateRequest.departureId
+      );
     }
 
     if (updateRequest.boatId !== boatId) {
       await this.checkScheduleExist(
+        "update",
         new Date(updateRequest.schedule),
         updateRequest.boatId
       );
     }
 
-    await this.checkMarkup(Number(userId), updateRequest.markupPrice);
+    await this.checkScheduleFormat("update", updateRequest.schedule);
+    await this.checkMarkup("update", Number(userId), updateRequest.markupPrice);
     await BoatService.checkBoatExistById(updateRequest.boatId);
     await PortService.checkPortExistById(updateRequest.arrivalId, "Arrival");
     await PortService.checkPortExistById(
       updateRequest.departureId,
       "Departure"
     );
-    this.checkPort(updateRequest.arrivalId, updateRequest.departureId);
+    this.checkPort(
+      "update",
+      updateRequest.arrivalId,
+      updateRequest.departureId
+    );
 
     const updatedPort = await prisma.schedule.update({
       where: { id },
       data: {
-        schedule: updateRequest.schedule,
+        schedule: new Date(updateRequest.schedule),
         seat: updateRequest.seat,
         price: updateRequest.price,
         markup_price: updateRequest.markupPrice,
@@ -222,6 +270,12 @@ export class ScheduleService {
     if (getRequest.schedule) {
       filters.push({
         schedule: new Date(getRequest.schedule),
+      });
+    }
+
+    if (getRequest.boatId) {
+      filters.push({
+        boat_id: Number(getRequest.boatId),
       });
     }
 
