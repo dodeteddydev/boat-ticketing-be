@@ -40,6 +40,7 @@ export type ScheduleRequest = {
 
 export type FilterScheduleRequest = {
   schedule?: string;
+  boatId?: number;
   arrivalId?: number;
   departureId?: number;
   page: number;

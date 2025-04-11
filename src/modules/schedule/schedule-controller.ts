@@ -86,9 +86,10 @@ export class ScheduleController {
   static async get(req: Request, res: Response, next: NextFunction) {
     try {
       const request = {
-        countryId: req.query.countryId && Number(req.query.countryId),
-        provinceId: req.query.provinceId && Number(req.query.provinceId),
-        cityId: req.query.cityId && Number(req.query.cityId),
+        schedule: req.query.schedule,
+        boatId: req.query.boatId && Number(req.query.boatId),
+        arrivalId: req.query.arrivalId && Number(req.query.arrivalId),
+        departureId: req.query.departureId && Number(req.query.departureId),
         page: req.query.page ? Number(req.query.page) : 1,
         size: req.query.size ? Number(req.query.size) : 10,
         all: req.query.all === "true",
