@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { prisma } from "../../config/database";
 import { ActiveRequest } from "../../types/activeRequest";
 import { Pageable } from "../../types/pageable";
@@ -35,7 +37,7 @@ export class BoatService {
 
   static async checkBoatExistById(
     id: number
-  ): Promise<{ boatName: string; boatCode: string }> {
+  ): Promise<{ boatName: string; boatCode: string; image: string | null }> {
     const existingBoat = await prisma.boat.findUnique({
       where: { id },
     });
@@ -51,12 +53,14 @@ export class BoatService {
     return {
       boatName: existingBoat.boat_name,
       boatCode: existingBoat.boat_code,
+      image: existingBoat.image,
     };
   }
 
   static async create(
     request: BoatRequest,
-    userId: number
+    userId: number,
+    imagePath?: string
   ): Promise<BoatResponse> {
     const createRequest = validation(BoatValidation.create, request);
 
@@ -67,6 +71,7 @@ export class BoatService {
       data: {
         boat_name: createRequest.boatName,
         boat_code: createRequest.boatCode,
+        image: imagePath,
         category: { connect: { id: Number(createRequest.categoryId) } },
         created_by: { connect: { id: Number(userId) } },
       },
@@ -83,7 +88,11 @@ export class BoatService {
     );
   }
 
-  static async update(request: BoatRequest, id: number): Promise<BoatResponse> {
+  static async update(
+    request: BoatRequest,
+    id: number,
+    imagePath?: string
+  ): Promise<BoatResponse> {
     const updateRequest = validation(BoatValidation.create, request);
 
     const existingBoat = await this.checkBoatExistById(id);
@@ -99,11 +108,19 @@ export class BoatService {
 
     await CategoryService.checkCategoryExistById(updateRequest.categoryId);
 
+    if (imagePath && existingBoat.image) {
+      const oldImagePath = path.join("uploads", existingBoat.image);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
+    }
+
     const updatedBoat = await prisma.boat.update({
       where: { id },
       data: {
         boat_name: updateRequest.boatName,
         boat_code: updateRequest.boatCode,
+        image: imagePath,
         category: { connect: { id: Number(updateRequest.categoryId) } },
       },
       include: {

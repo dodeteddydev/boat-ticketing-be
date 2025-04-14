@@ -9,6 +9,7 @@ export class BoatValidation {
       .string({ required_error: "Boat code is required" })
       .min(1, "Boat code must be at least 1 character"),
     categoryId: z.number({ required_error: "Category is required" }).min(1),
+    image: z.string().optional(),
   });
 
   static update: ZodType = this.create;
