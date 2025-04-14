@@ -83,7 +83,7 @@ export class ScheduleController {
     }
   }
 
-  static async get(req: Request, res: Response, next: NextFunction) {
+  static async get(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const request = {
         schedule: req.query.schedule,
@@ -95,7 +95,7 @@ export class ScheduleController {
         all: req.query.all === "true",
       } as FilterScheduleRequest;
 
-      const response = await ScheduleService.get(request);
+      const response = await ScheduleService.get(request, req.userId!);
 
       res
         .status(200)

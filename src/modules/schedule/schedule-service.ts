@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { prisma } from "../../config/database";
 import { ActiveRequest } from "../../types/activeRequest";
 import { Pageable } from "../../types/pageable";
@@ -259,9 +260,14 @@ export class ScheduleService {
   }
 
   static async get(
-    request: FilterScheduleRequest
+    request: FilterScheduleRequest,
+    userId: number
   ): Promise<Pageable<ScheduleResponse>> {
     const getRequest = validation(ScheduleValidation.get, request);
+
+    const checkRole = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
 
     const skip = (getRequest.page - 1) * getRequest.size;
 
@@ -293,6 +299,8 @@ export class ScheduleService {
 
     const getPort = await prisma.schedule.findMany({
       where: {
+        created_by_id:
+          checkRole?.role !== Role.superadmin ? checkRole?.id : undefined,
         AND: filters,
       },
       orderBy: {

@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import fs from "fs";
 import path from "path";
 import { prisma } from "../../config/database";
@@ -155,9 +156,15 @@ export class BoatService {
   }
 
   static async get(
-    request: FilterBoatRequest
+    request: FilterBoatRequest,
+    userId: number
   ): Promise<Pageable<BoatResponse>> {
     const getRequest = validation(BoatValidation.get, request);
+
+    const checkRole = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
+
     const skip = (getRequest.page - 1) * getRequest.size;
 
     const filters = [];
@@ -187,6 +194,8 @@ export class BoatService {
 
     const getBoat = await prisma.boat.findMany({
       where: {
+        created_by_id:
+          checkRole?.role !== Role.superadmin ? checkRole?.id : undefined,
         AND: filters,
       },
       orderBy: {
@@ -225,7 +234,14 @@ export class BoatService {
   }
 
   static async delete(id: number): Promise<string> {
-    await this.checkBoatExistById(id);
+    const existingBoat = await this.checkBoatExistById(id);
+
+    if (existingBoat.image) {
+      const imagePath = path.join("uploads", existingBoat.image);
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
 
     await prisma.boat.delete({
       where: { id },

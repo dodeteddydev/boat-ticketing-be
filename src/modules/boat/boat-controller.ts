@@ -84,7 +84,7 @@ export class BoatController {
     }
   }
 
-  static async get(req: Request, res: Response, next: NextFunction) {
+  static async get(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const request = {
         search: req.query.search as string,
@@ -94,7 +94,7 @@ export class BoatController {
         all: req.query.all === "true",
       } as FilterBoatRequest;
 
-      const response = await BoatService.get(request);
+      const response = await BoatService.get(request, req.userId!);
 
       res
         .status(200)
