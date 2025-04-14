@@ -13,6 +13,7 @@ export type BoatResponse = {
   boatName: string;
   boatCode: string | null;
   category: CategoryGlobalResponse;
+  image: string | null;
   createdBy: UserGlobalResponse | null;
   createdAt: string;
   updatedAt: string;
@@ -23,6 +24,7 @@ export type BoatRequest = {
   boatName: string;
   boatCode: string;
   categoryId: number;
+  image?: string;
 };
 
 export type FilterBoatRequest = {
@@ -43,6 +45,7 @@ export const convertBoatResponse = (
     boatName: boat.boat_name,
     boatCode: boat.boat_code,
     category: category,
+    image: boat.image,
     createdBy: createdBy,
     createdAt: boat.created_at.toISOString(),
     updatedAt: boat.updated_at.toISOString(),

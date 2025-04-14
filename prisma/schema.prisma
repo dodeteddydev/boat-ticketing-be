@@ -159,6 +159,7 @@ model Boat {
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   schedule Schedule[]
+  image String? @db.VarChar(255)
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   active Boolean @default(true)

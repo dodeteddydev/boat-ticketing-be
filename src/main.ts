@@ -12,11 +12,21 @@ import { userRoute } from "./modules/user/user-route";
 import { boatRoute } from "./modules/boat/boat-route";
 import { portRoute } from "./modules/port/port-route";
 import { scheduleRoute } from "./modules/schedule/schedule-route";
+import path from "path";
+import fs from "fs";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
 
 const app = express();
+
+const uploadDir = path.join(__dirname, "..", "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log("✅ 'uploads' folder created");
+} else {
+  console.log("📁 'uploads' folder already exists");
+}
 
 app.use(express.json());
 app.use(cookieParser());
@@ -26,6 +36,8 @@ app.use(
     credentials: true,
   })
 );
+
+app.use("/uploads", express.static("uploads"));
 
 // ROUTE
 app.use(authRoute);

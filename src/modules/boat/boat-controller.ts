@@ -9,7 +9,12 @@ export class BoatController {
   static async create(req: AuthRequest, res: Response, next: NextFunction) {
     try {
       const request = req.body as BoatRequest;
-      const response = await BoatService.create(request, req.userId!);
+      const imagePath = req.file?.filename;
+      const response = await BoatService.create(
+        { ...request, categoryId: Number(request.categoryId) },
+        req.userId!,
+        imagePath
+      );
       res
         .status(201)
         .json(ResponseHelpers.success("Boat created successfully", response));
@@ -22,6 +27,7 @@ export class BoatController {
     try {
       const { id } = req.params;
       const request = req.body as BoatRequest;
+      const imagePath = req.file?.filename;
 
       const boatId = Number(id);
       if (isNaN(boatId)) {
@@ -36,7 +42,11 @@ export class BoatController {
         return;
       }
 
-      const response = await BoatService.update(request, boatId);
+      const response = await BoatService.update(
+        { ...request, categoryId: Number(request.categoryId) },
+        boatId,
+        imagePath
+      );
 
       res
         .status(200)
