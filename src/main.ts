@@ -14,6 +14,7 @@ import { portRoute } from "./modules/port/port-route";
 import { scheduleRoute } from "./modules/schedule/schedule-route";
 import path from "path";
 import fs from "fs";
+import { logger } from "./config/logger";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -23,9 +24,9 @@ const app = express();
 const uploadDir = path.join(__dirname, "..", "uploads");
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
-  console.log("✅ 'uploads' folder created");
+  logger.info("✅ 'uploads' folder created");
 } else {
-  console.log("📁 'uploads' folder already exists");
+  logger.info("📁 'uploads' folder already exists");
 }
 
 app.use(express.json());
@@ -37,7 +38,7 @@ app.use(
   })
 );
 
-app.use("/uploads", express.static("uploads"));
+app.use("/api/uploads", express.static("uploads"));
 
 // ROUTE
 app.use(authRoute);
@@ -54,4 +55,4 @@ app.use(scheduleRoute);
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
-app.listen(PORT, () => console.log(`Server running on http://${HOST}:${PORT}`));
+app.listen(PORT, () => logger.info(`Server running on http://${HOST}:${PORT}`));
