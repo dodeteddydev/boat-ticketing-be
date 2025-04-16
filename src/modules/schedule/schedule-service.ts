@@ -274,8 +274,15 @@ export class ScheduleService {
     const filters = [];
 
     if (getRequest.schedule) {
+      const selectedDate = new Date(getRequest.schedule);
+      const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
+      const endOfDay = new Date(selectedDate.setHours(23, 59, 59, 999));
+
       filters.push({
-        schedule: new Date(getRequest.schedule),
+        schedule: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
       });
     }
 
