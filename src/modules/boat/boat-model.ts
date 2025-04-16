@@ -6,6 +6,7 @@ export type BoatGlobalResponse = {
   id: number;
   boatName: string;
   boatCode: string | null;
+  image: string | null;
 };
 
 export type BoatResponse = {
@@ -58,5 +59,6 @@ export const convertBoatGlobalResponse = (boat: Boat): BoatGlobalResponse => {
     id: boat.id,
     boatName: boat.boat_name,
     boatCode: boat.boat_code,
+    image: boat.image,
   };
 };
