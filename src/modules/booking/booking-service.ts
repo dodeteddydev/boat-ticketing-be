@@ -19,6 +19,7 @@ import { ScheduleService } from "../schedule/schedule-service";
 import { CountryService } from "../country/country-service";
 import { ProvinceService } from "../province/province-service";
 import { CityService } from "../city/city-service";
+import { BoatService } from "../boat/boat-service";
 
 type BookingWithRelations = Prisma.BookingGetPayload<{
   include: {
@@ -73,21 +74,17 @@ export class BookingService {
   ): Promise<BookingResponse[]> {
     const createRequest = validation(BookingValidation.create, request);
 
-    await ScheduleService.checkScheduleExistById(createRequest[0].scheduleId);
+    const schedule = await ScheduleService.checkScheduleExistById(
+      createRequest[0].scheduleId
+    );
+    const boat = await BoatService.checkBoatExistById(schedule.boatId);
     await CountryService.checkCountryExistById(createRequest[0].countryId);
     await ProvinceService.checkProvinceExistById(createRequest[0].provinceId);
     await CityService.checkCityExistById(createRequest[0].cityId);
 
     const createdBooking: BookingWithRelations[] = await Promise.all(
       createRequest.map(async (booking) => {
-        const schedule = await prisma.schedule.findUnique({
-          where: { id: Number(booking.scheduleId) },
-          include: { boat: true },
-        });
-
-        const bookingNumber = generateBookingNumber(
-          schedule && schedule.boat ? schedule.boat.boat_code : "XX"
-        );
+        const bookingNumber = generateBookingNumber(boat.boatCode);
 
         return await prisma.booking.create({
           data: {
