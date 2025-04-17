@@ -36,6 +36,14 @@ type BookingWithRelations = Prisma.BookingGetPayload<{
   };
 }>;
 
+const generateBookingNumber = (boatCode: string): string => {
+  const randomPart = Math.floor(100 + Math.random() * 900);
+  const timePart = Date.now().toString().slice(-3);
+  const bookingNumber = `${boatCode}-${timePart}${randomPart}`;
+
+  return bookingNumber;
+};
+
 export class BookingService {
   static async checkAmountValid(userId: number, price: number) {
     const wallet = await prisma.wallet.findUnique({
@@ -72,10 +80,23 @@ export class BookingService {
 
     const createdBooking: BookingWithRelations[] = await Promise.all(
       createRequest.map(async (booking) => {
+        const schedule = await prisma.schedule.findUnique({
+          where: { id: Number(booking.scheduleId) },
+          include: { boat: true },
+        });
+
+        if (!schedule || !schedule.boat) {
+          throw new Error(
+            `Schedule or boat not found for schedule ID ${booking.scheduleId}`
+          );
+        }
+
+        const bookingNumber = generateBookingNumber(schedule.boat.boat_code);
+
         return await prisma.booking.create({
           data: {
             schedule: { connect: { id: Number(booking.scheduleId), seat: -1 } },
-            booking_number: booking.bookingNumber,
+            booking_number: bookingNumber,
             passenger_name: booking.passengerName,
             id_type: booking.idType,
             id_number: booking.idNumber,

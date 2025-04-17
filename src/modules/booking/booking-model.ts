@@ -24,7 +24,6 @@ export type BookingResponse = {
 
 export type BookingRequest = {
   scheduleId: number;
-  bookingNumber: string;
   passengerName: string;
   idType: IdType;
   idNumber: string;
