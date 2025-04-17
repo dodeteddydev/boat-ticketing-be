@@ -35,6 +35,11 @@ export const errorMiddleware = (
   } else {
     res
       .status(500)
-      .json(ResponseHelpers.error("Internal Server Error", err.message));
+      .json(
+        ResponseHelpers.error(
+          "Internal Server Error",
+          "Something went wrong. Please try again later."
+        )
+      );
   }
 };

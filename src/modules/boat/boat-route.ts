@@ -14,7 +14,6 @@ boatRoute.post(
   upload.single("image"),
   BoatController.create
 );
-
 boatRoute.put(
   "/api/boat/:id",
   authMiddleware,

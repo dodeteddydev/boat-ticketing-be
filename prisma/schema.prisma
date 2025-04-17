@@ -225,7 +225,7 @@ model Booking {
   city_id Int
   city City @relation(fields: [city_id], references: [id], onDelete: Cascade)
   address String @db.VarChar(255)
-  booking_status BookingStatus
+  booking_status BookingStatus @default(pending)
   created_by_id Int
   created_by User @relation(fields: [created_by_id], references: [id], onDelete: Cascade)
   created_at DateTime @default(now())
