@@ -85,13 +85,9 @@ export class BookingService {
           include: { boat: true },
         });
 
-        if (!schedule || !schedule.boat) {
-          throw new Error(
-            `Schedule or boat not found for schedule ID ${booking.scheduleId}`
-          );
-        }
-
-        const bookingNumber = generateBookingNumber(schedule.boat.boat_code);
+        const bookingNumber = generateBookingNumber(
+          schedule && schedule.boat ? schedule.boat.boat_code : "XX"
+        );
 
         return await prisma.booking.create({
           data: {
