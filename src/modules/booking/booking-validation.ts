@@ -5,7 +5,7 @@ export class BookingValidation {
     .array(
       z.object({
         scheduleId: z.number({ required_error: "Schedule is required" }).min(1),
-        passangerName: z
+        passengerName: z
           .string({ required_error: "Passanger name is required" })
           .min(1, "Passanger name must be at least 1 character"),
         idType: z.enum(["ktp", "passport"]),

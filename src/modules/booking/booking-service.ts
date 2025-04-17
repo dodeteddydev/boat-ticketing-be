@@ -86,32 +86,52 @@ export class BookingService {
       createRequest.map(async (booking) => {
         const bookingNumber = generateBookingNumber(boat.boatCode);
 
-        return await prisma.booking.create({
-          data: {
-            schedule: { connect: { id: Number(booking.scheduleId), seat: -1 } },
-            booking_number: bookingNumber,
-            passenger_name: booking.passengerName,
-            id_type: booking.idType,
-            id_number: booking.idNumber,
-            country: { connect: { id: Number(booking.countryId) } },
-            province: { connect: { id: Number(booking.provinceId) } },
-            city: { connect: { id: Number(booking.cityId) } },
-            address: booking.address,
-            created_by: { connect: { id: Number(userId) } },
-          },
-          include: {
-            schedule: {
-              include: {
-                boat: true,
-                arrival: true,
-                departure: true,
+        return await prisma.$transaction(async (tx) => {
+          const updatedSchedule = await tx.schedule.updateMany({
+            where: {
+              id: Number(booking.scheduleId),
+              seat: {
+                gte: 1,
               },
             },
-            country: true,
-            province: true,
-            city: true,
-            created_by: true,
-          },
+            data: {
+              seat: {
+                decrement: 1,
+              },
+            },
+          });
+
+          if (updatedSchedule.count === 0) {
+            throw new Error("No seats available for this schedule.");
+          }
+
+          return await tx.booking.create({
+            data: {
+              schedule: { connect: { id: Number(booking.scheduleId) } },
+              booking_number: bookingNumber,
+              passenger_name: booking.passengerName,
+              id_type: booking.idType,
+              id_number: booking.idNumber,
+              country: { connect: { id: Number(booking.countryId) } },
+              province: { connect: { id: Number(booking.provinceId) } },
+              city: { connect: { id: Number(booking.cityId) } },
+              address: booking.address,
+              created_by: { connect: { id: Number(userId) } },
+            },
+            include: {
+              schedule: {
+                include: {
+                  boat: true,
+                  arrival: true,
+                  departure: true,
+                },
+              },
+              country: true,
+              province: true,
+              city: true,
+              created_by: true,
+            },
+          });
         });
       })
     );
