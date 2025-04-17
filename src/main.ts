@@ -15,6 +15,7 @@ import { scheduleRoute } from "./modules/schedule/schedule-route";
 import path from "path";
 import fs from "fs";
 import { logger } from "./config/logger";
+import { bookingRoute } from "./modules/booking/booking-route";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -50,6 +51,7 @@ app.use(categoryRoute);
 app.use(boatRoute);
 app.use(portRoute);
 app.use(scheduleRoute);
+app.use(bookingRoute);
 
 // MIDDLEWARE
 app.use(notFoundMiddleware);
