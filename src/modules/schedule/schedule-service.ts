@@ -38,7 +38,7 @@ export class ScheduleService {
 
   static async checkScheduleExistById(
     portId: number
-  ): Promise<{ schedule: Date; boatId: number }> {
+  ): Promise<{ schedule: Date; boatId: number; price: number }> {
     const existingSchedule = await prisma.schedule.findUnique({
       where: { id: portId },
     });
@@ -54,6 +54,7 @@ export class ScheduleService {
     return {
       schedule: existingSchedule.schedule,
       boatId: existingSchedule.boat_id,
+      price: existingSchedule.price + (existingSchedule.markup_price ?? 0),
     };
   }
 
