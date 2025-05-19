@@ -18,7 +18,6 @@ export type TransactionResponse = {
 export type TransactionRequest = {
   amountTransaction: number;
   proofImage: string;
-  transactionType: TransactionType;
 };
 
 export type FilterTransactionRequest = {

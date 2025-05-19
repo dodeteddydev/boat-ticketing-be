@@ -31,9 +31,13 @@ enum BookingStatus {
 }
 
 enum TransactionType {
-  pending
   incoming
   outgoing
+}
+
+enum TopupStatus {
+  pending
+  success
   failed
 }
 
@@ -135,6 +139,7 @@ model Transaction {
   amount_transaction Float @default(0)
   proof_image String? @db.VarChar(255)
   transaction_type TransactionType
+  topup_status TopupStatus
   created_at DateTime @default(now())
 
   @@map("transaction")
