@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import fetch from "node-fetch";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
@@ -29,6 +30,18 @@ type CitySeed = {
 };
 
 async function main() {
+  // Seed Users Superadmin
+  const user = await prisma.user.create({
+    data: {
+      name: "Superadmin",
+      username: "superadmin",
+      email: "superadmin@mail.com",
+      password: await bcrypt.hash("123456", 10),
+      role: "superadmin",
+      status: "verified",
+    },
+  });
+
   // Seed Countries
   const countries = await fetchData<CountrySeed[]>("countries");
   for (const country of countries) {
@@ -36,7 +49,7 @@ async function main() {
       data: {
         country_name: country.name,
         country_code: country.iso2,
-        created_by: { connect: { id: 1 } },
+        created_by: { connect: { id: Number(user.id) } },
       },
     });
   }
@@ -53,7 +66,7 @@ async function main() {
           province_name: state.name,
           province_code: state.state_code,
           country: { connect: { id: country.id } },
-          created_by: { connect: { id: 1 } },
+          created_by: { connect: { id: Number(user.id) } },
         },
       });
     }
@@ -77,7 +90,7 @@ async function main() {
           city_name: city.name,
           country: { connect: { id: country.id } },
           province: { connect: { id: state.id } },
-          created_by: { connect: { id: 1 } },
+          created_by: { connect: { id: Number(user.id) } },
         },
       });
     }
