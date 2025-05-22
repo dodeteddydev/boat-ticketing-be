@@ -1,4 +1,6 @@
 import { TopupStatus } from "@prisma/client";
+import fs from "fs";
+import path from "path";
 import { prisma } from "../../config/database";
 import { Pageable } from "../../types/pageable";
 import { ErrorResponse } from "../../utilities/errorResponse";
@@ -43,9 +45,12 @@ export class TransactionService {
     userId: number,
     imagePath: string
   ): Promise<TransactionResponse> {
-    const createRequest = validation(TransactionValidation.create, request);
+    const createRequest = validation(TransactionValidation.create, {
+      amountTransaction: Number(request.amountTransaction),
+      proofImage: imagePath,
+    });
 
-    const walletId = await WalletService.checkWalletExist(userId);
+    const wallet = await WalletService.checkWalletExist(Number(userId));
 
     const createdTransaction = await prisma.transaction.create({
       data: {
@@ -53,7 +58,7 @@ export class TransactionService {
         proof_image: imagePath,
         transaction_type: "incoming",
         topup_status: "pending",
-        wallet: { connect: { id: Number(walletId) } },
+        wallet: { connect: { id: Number(wallet.id) } },
       },
     });
 
@@ -65,7 +70,10 @@ export class TransactionService {
     id: number,
     imagePath: string
   ): Promise<TransactionResponse> {
-    const updateRequest = validation(TransactionValidation.update, request);
+    const updateRequest = validation(TransactionValidation.update, {
+      amountTransaction: Number(request.amountTransaction),
+      proofImage: imagePath,
+    });
 
     const existingTransaction = await this.checkTransactionExist(id);
 
@@ -75,6 +83,13 @@ export class TransactionService {
         "Transaction cannot be updated",
         "Transaction has already been processed!"
       );
+    }
+
+    if (imagePath && existingTransaction.proofImage) {
+      const oldImagePath = path.join("uploads", existingTransaction.proofImage);
+      if (fs.existsSync(oldImagePath)) {
+        fs.unlinkSync(oldImagePath);
+      }
     }
 
     const updatedTransaction = await prisma.transaction.update({
@@ -120,7 +135,7 @@ export class TransactionService {
   static async reject(id: number): Promise<TransactionResponse> {
     const transaction = await this.checkTransactionExist(id);
 
-    if (transaction.topupStatus !== "success") {
+    if (transaction.topupStatus !== "pending") {
       throw new ErrorResponse(
         400,
         "Transaction cannot be rejected",
@@ -143,14 +158,21 @@ export class TransactionService {
     userId: number
   ): Promise<Pageable<TransactionResponse>> {
     const getRequest = validation(TransactionValidation.get, request);
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+    });
 
-    const wallet = await WalletService.checkWalletExist(userId);
+    let walletId: number | undefined;
+
+    if (user?.role !== "superadmin") {
+      walletId = (await WalletService.checkWalletExist(Number(userId))).id;
+    }
 
     const skip = (getRequest.page - 1) * getRequest.size;
 
     const getTransaction = await prisma.transaction.findMany({
       where: {
-        wallet_id: Number(wallet.id),
+        wallet_id: walletId ? Number(walletId) : undefined,
       },
       orderBy: {
         created_at: "desc",
@@ -161,7 +183,7 @@ export class TransactionService {
 
     const total = await prisma.transaction.count({
       where: {
-        wallet_id: Number(wallet.id),
+        wallet_id: walletId ? Number(walletId) : undefined,
       },
     });
 

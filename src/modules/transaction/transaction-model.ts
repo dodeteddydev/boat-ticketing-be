@@ -1,10 +1,11 @@
-import { Transaction, TransactionType } from "@prisma/client";
+import { TopupStatus, Transaction, TransactionType } from "@prisma/client";
 
 export type TransactionGlobalResponse = {
   id: number;
   amountTransaction: number;
   proofImage: string;
   transactionType: TransactionType;
+  topupStatus: TopupStatus;
 };
 
 export type TransactionResponse = {
@@ -12,6 +13,7 @@ export type TransactionResponse = {
   amountTransaction: number;
   proofImage: string;
   transactionType: TransactionType;
+  topupStatus: TopupStatus;
   createdAt: string;
 };
 
@@ -21,7 +23,6 @@ export type TransactionRequest = {
 };
 
 export type FilterTransactionRequest = {
-  search?: string;
   page: number;
   size: number;
   all?: boolean;
@@ -35,6 +36,7 @@ export const convertTransactionResponse = (
     amountTransaction: transaction.amount_transaction,
     proofImage: transaction.proof_image!,
     transactionType: transaction.transaction_type,
+    topupStatus: transaction.topup_status,
     createdAt: transaction.created_at.toISOString(),
   };
 };
@@ -47,5 +49,6 @@ export const convertTransactionGlobalResponse = (
     amountTransaction: transaction.amount_transaction,
     proofImage: transaction.proof_image!,
     transactionType: transaction.transaction_type,
+    topupStatus: transaction.topup_status,
   };
 };

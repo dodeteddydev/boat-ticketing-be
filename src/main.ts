@@ -16,6 +16,8 @@ import path from "path";
 import fs from "fs";
 import { logger } from "./config/logger";
 import { bookingRoute } from "./modules/booking/booking-route";
+import { transactionRoute } from "./modules/transaction/transaction-route";
+import { walletRoute } from "./modules/wallet/wallet-route";
 
 const HOST = process.env.HOST;
 const PORT = process.env.PORT;
@@ -52,6 +54,8 @@ app.use(boatRoute);
 app.use(portRoute);
 app.use(scheduleRoute);
 app.use(bookingRoute);
+app.use(walletRoute);
+app.use(transactionRoute);
 
 // MIDDLEWARE
 app.use(notFoundMiddleware);

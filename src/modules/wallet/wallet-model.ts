@@ -8,6 +8,11 @@ export type WalletResponse = {
   updatedAt: string;
 };
 
+export type BalanceResponse = {
+  amount: number;
+  updatedAt: string;
+};
+
 export const convertWalletResponse = (
   wallet: Wallet,
   transaction: TransactionGlobalResponse

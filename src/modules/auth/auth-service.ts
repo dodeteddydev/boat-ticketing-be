@@ -63,7 +63,7 @@ export class AuthService {
       data: registerRequest,
     });
 
-    if (user.role === "boatowner" || user.role === "customer")
+    if (user.role === "superadmin" || user.role === "customer")
       await WalletService.create(user.id);
 
     return convertRegisterResponse(user);
